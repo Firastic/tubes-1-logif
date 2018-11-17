@@ -1,0 +1,133 @@
+Kelompok: Wangky Adventure
+Anggota:
+•	13517007
+•	13517070
+•	13517091
+•	13517115
+
+Konsep cerita: Indonesia
+
+Weapon - Ammo:
+Keris - (No)
+Kujang - (No)
+Bambu Runcing - (No)
+Panah Pasopati - Anak Panah (Panah)
+Sumpit - Anak Panah (Sumpit)
+Default: Barehand
+
+Armor:
+Tameng
+Zirah
+Topi Besi
+Jimat
+Batu Akik
+
+Medicine:
+Panadol
+OBH Combi
+Minyak Kayu Putih
+Jamu
+
+====
+Map:
+10x10
+
+====
+Enemy:
+Tentara Belanda
+Tentara Jepang
+Antek PKI
+Koruptor
+
+(Enemy gak harus bisa nyerang)
+====
+
+Initialize game:
+Create map
+Create Player
+Place Player
+Place Object
+Place NPC
+
+Loop game:
+Update Player position
+Update NPC position
+Update Object in inventory
+Update Object in map
+Update Map
+
+====
+
+Fakta:
+Health(P (Player),X (Amount))
+Armor(P (Player),X (Amount))
+Weapon(P (Player), X(Equipped Weapon))
+InInventory(P (Player), I (Items))
+Position(P (Player), X(x pos), Y (y pos))
+
+IsWeapon(I (Items))
+IsMedicine(I (Items))
+IsArmor(I (Items))
+IsAmmo(I (Items))
+IsNPC(E (Enemy))
+
+Damage(W (Weapon), X (Damage))
+Ammo(W (Weapon, A (Ammo)) -> W butuh ammo A
+AmmoAmount(W (Weapon), X (Amount))
+Medicine(M (Medicine), X (Health))
+ArmorAmount(A (Armor), X (Armor Amount))
+ItemPosition(O (Object), X (x pos), Y (y pos))
+
+MapSize(M (List),X (Size))
+IsDeadzone(X (x pos), Y (y pos))
+TimeUntilDeadzone(X (Amount))
+IsLoaded(G (Game))
+IsStarted(G))
+
+Rules
+OutputMap(M) : Print(M)
+initializePlayer(P): Health(P,100), Armor(P,0), InInventory(P, Null)
+initalizeMap(M): Atur list, Randomize objek yang ada, Atur posisi objek, Randomize NPC, Atur posisi NPC
+NPCMove(P): Randomize 4 arah mata angin buat NPC
+
+Help: Print(Instruksi)
+
+start: cls, Print(sesuatu), Help(), IsLoaded(False) iniatializePlayer(p), initializeMap(m), OutputMap(m), Ubah IsStarted(G) jadi true
+start: cls, Print(sesuatu), Help(), IsLoaded(True), OutputMap(m), Ubah IsStarted(G) jadi true
+
+quit: quit program
+
+outputGrid(x,y): Cek semua Position(O,x,y), atur sesuai prioritas
+
+n: Ubah Y player jadi Y-1, Buat tiap NPC x -> NPCMove(x)
+s: Ubah Y player jadi Y+1, Buat tiap NPC x -> NPCMove(x)
+e: Ubah X player jadi X+1, Buat tiap NPC x -> NPCMove(x)
+w: Ubah X player jadi X-1, Buat tiap NPC x -> NPCMove(x)
+
+Look: Buat 9 mata angin x y, outputGrid(x,y)
+
+Map: OutputMap()
+
+Take(I): Cek eksistensi objek di posisi player dengan ItemPosition(I,x,y), Hilangkan posisi objek dari map, InInventory(P,I) menjadi true
+Take(I): Kalo gaada objek, Print(error)
+
+Drop(I): Cek eksistensi objek dengan InInventory(P,I), Ubah jad false, ItemPosition(I,x,y) menjadi true
+
+Use(I): Not InInventory(I), !, fail
+Use(I): IsMedicine(I), !, Ubah health player
+Use(I): IsArmor(I), !, Ubah armor player
+Use(I): IsAmmo(I), kalo gaada equipped weapon atau equipped weapon ammonya gak sesuai di fail
+Use(I): IsAmmo(I), kalo bisa dipake langsung pake, !
+Use(I): IsWeapon(I), Kalo gaada equipped weapon langsung diequip
+Use(I): IsWeapon(I), Kalo ada weapon langsung dequip weapon, equip weapon baru
+
+Attack: Kalo gaada enemy di fail
+Attack: Kalo gaada weapon print gapunya weapon, serang pake barehand
+Attack: Kalo ada weapon tapi gaada ammo, print ammo abis, serang pake barehand
+Attack: Kurangin Health kita dengan weapon enemy, Kurangin Health mereka dengan weapon kita, Kurangin Ammo kita, Kurangin ammo musuh, print sesuatu
+
+Status: Print Health(p,X), Armor(p,Y), Weapon(p, Z), InInventory(p, A)
+
+Save: Save ke file external
+
+Load: Ubah IsLoaded(g) jadi true, load file external
