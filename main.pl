@@ -2,6 +2,7 @@
 /*:-dynamic(location/1).*/
 :-dynamic(map_element/4).
 :-dynamic(position/2).
+:-dynamic(countMove/1).
 
 health(player,100).
 armor(player,0).
@@ -57,12 +58,6 @@ armorAmmount(helm, 10).
 armorAmmount(jimat, 10).
 armorAmmount(batuAkik, 50).
 
-map_element(' X ',' - ',1,1).
-map_element(' X ',' - ',1,2).
-map_element(' X ',' - ',1,3).
-map_element(' X ',' - ',1,4).
-
-position(1,2).
 
 
 start:-
@@ -89,7 +84,7 @@ start:-
   repeat,
   write('>'), read(A),
   do(A),nl,
-  (A == quit).
+  (A == quit ; gameoverZonaMati).
 
 help :-
   write('Perintah yang dapat Anda jalankan:                                         '),nl,
@@ -117,6 +112,9 @@ help :-
   write('   X = Zona mati. Jangan bergerak ke Zona ini!                             '),nl,nl.
 
 
+bacaFakta(end_of_file):- !.
+bacaFakta(X):- asserta(X),!,fail.
+
 game_start:-
   /*
   open('map.txt',read,S),
@@ -134,43 +132,161 @@ game_start:-
         write(H),nl, Bx is B+1,
         read_file(S,T,A,Bx).
   */
-  retract(map_element(_,_,1,1)),
-  asserta(map_element(' X ',' - ',1,1)),
-  retract(map_element(_,_,1,2)),
-  asserta(map_element(' X ',' - ',1,2)),
-  retract(map_element(_,_,1,3)),
-  asserta(map_element(' X ',' - ',1,3)),
-  retract(map_element(_,_,1,4)),
-  asserta(map_element(' X ',' - ',1,4)),
-  retract(position(_,_)),
-  asserta(position(1,2)).
+
+      open('mulaigim.txt',read,In),
+      (
+        repeat,
+        read_term(In, X, []),
+        bacaFakta(X),asserta(X), !
+      ),
+      close(In),
+
+      retract(map_element(_,_,2,2)),
+      asserta(map_element('P','-',2,2)).
+
 
 quit :-
   write(' Wangky gagal karena kamu :( ').
 
-
-
+map1(N):-
+  (map_element(A,_,N,1) -> write(A)),
+  (map_element(B,_,N,2) -> write(B)),
+  (map_element(C,_,N,3) -> write(C)),
+  (map_element(D,_,N,4) -> write(D)),
+  (map_element(E,_,N,5) -> write(E)),
+  (map_element(F,_,N,6) -> write(F)),
+  (map_element(G,_,N,7) -> write(G)),
+  (map_element(H,_,N,8) -> write(H)),
+  (map_element(I,_,N,9) -> write(I)),
+  (map_element(J,_,N,10) -> write(J)),
+  (map_element(K,_,N,11) -> write(K)),
+  (map_element(L,_,N,12) -> write(L)),nl.
 
 map :-
-    (map_element(A,_,1,1) -> write(A)),
-    (map_element(A,_,1,2) -> write(A)),
-    (map_element(A,_,1,3) -> write(A)),
-    (map_element(A,_,1,4) -> write(A)).
+  map1(1),map1(2),map1(3),map1(4),map1(5),map1(6),map1(7),map1(8),map1(9),
+  map1(10),map1(11),map1(12).
+
+s :- position(A,B), Ax is (A+1),
+     (map_element('X',_,Ax,B)),retract(position(A,B)),asserta(position(Ax,B)),
+     retract(countMove(C)),Cx is C+1, asserta(countMove(Cx)).
+
+s :-  position(A,B), Ax is (A+1),
+       retract(position(A,B)),retract(map_element(_,_,A,B)), asserta(map_element('-','-',A,B)),
+       asserta(position(Ax,B)),
+       retract(map_element(_,_,Ax,B)),asserta(map_element('P','-',Ax,B)),
+       retract(countMove(C)),Cx is C+1, asserta(countMove(Cx)),tambahDeadZone.
+
+n :- position(A,B), Ax is (A-1),
+     (map_element('X',_,Ax,B)),retract(position(A,B)),asserta(position(Ax,B)),
+     retract(countMove(C)),Cx is C+1, asserta(countMove(Cx)).
+
+n :- position(A,B), Ax is (A-1),
+     retract(position(A,B)),retract(map_element(_,_,A,B)), asserta(map_element('-','-',A,B)),
+     asserta(position(Ax,B)),
+     retract(map_element(_,_,Ax,B)),asserta(map_element('P','-',Ax,B)),
+     retract(countMove(C)),Cx is C+1, asserta(countMove(Cx)),tambahDeadZone.
+
+e :- position(A,B), Bx is (B+1),
+     (map_element('X',_,A,Bx)),retract(position(A,B)),asserta(position(A,Bx)),
+     retract(countMove(C)),Cx is C+1, asserta(countMove(Cx)).
+
+e :-  position(A,B), Bx is (B+1),
+      retract(position(A,B)),retract(map_element(_,_,A,B)), asserta(map_element('-','-',A,B)),
+      asserta(position(A,Bx)),
+      retract(map_element(_,_,A,Bx)),asserta(map_element('P','-',A,Bx)),
+      retract(countMove(C)),Cx is C+1, asserta(countMove(Cx)),tambahDeadZone.
+
+w :- position(A,B), Bx is (B-1),
+      (map_element('X',_,A,Bx)),retract(position(A,B)),asserta(position(A,Bx)),
+      retract(countMove(C)),Cx is C+1, asserta(countMove(Cx)).
+
+w :-  position(A,B), Bx is (B-1),
+      retract(position(A,B)),retract(map_element(_,_,A,B)), asserta(map_element('-','-',A,B)),
+      asserta(position(A,Bx)),
+      retract(map_element(_,_,A,Bx)),asserta(map_element('P','-',A,Bx)),
+      retract(countMove(C)),Cx is C+1, asserta(countMove(Cx)),tambahDeadZone.
 
 
-s :-
-    (position(A,B) -> retract(map_element(_,_,A,B)), asserta(map_element(' P ',_,A,B))).
+
+look :- position(A,B),
+        A1 is A-1,
+        A2 is A+1,
+        B1 is B-1,
+        B2 is B+1,
+
+        (map_element(_,C,A1,B1) -> write(C)),
+        (map_element(_,D,A1,B) ,write(D)),
+        (map_element(_,E,A1,B2) -> write(E)),nl,
+        (map_element(_,F,A,B1) -> write(F)),
+        (map_element(_,G,A,B) -> write(G)),
+        (map_element(_,H,A,B2) -> write(H)),nl,
+        (map_element(_,I,A2,B1) -> write(I)),
+        (map_element(_,J,A2,B) -> write(J)),
+        (map_element(_,K,A2,B2) -> write(K)).
+
+
+updatemapbaris(N) :-
+    retract(map_element(_,_,N,1)), asserta(map_element('X','-',N,1)),
+    retract(map_element(_,_,N,2)), asserta(map_element('X','-',N,2)),
+    retract(map_element(_,_,N,3)), asserta(map_element('X','-',N,3)),
+    retract(map_element(_,_,N,4)), asserta(map_element('X','-',N,4)),
+    retract(map_element(_,_,N,5)), asserta(map_element('X','-',N,5)),
+    retract(map_element(_,_,N,6)), asserta(map_element('X','-',N,6)),
+    retract(map_element(_,_,N,7)), asserta(map_element('X','-',N,7)),
+    retract(map_element(_,_,N,8)), asserta(map_element('X','-',N,8)),
+    retract(map_element(_,_,N,9)), asserta(map_element('X','-',N,9)),
+    retract(map_element(_,_,N,10)), asserta(map_element('X','-',N,10)),
+    retract(map_element(_,_,N,11)), asserta(map_element('X','-',N,11)),
+    retract(map_element(_,_,N,12)), asserta(map_element('X','-',N,12)).
+
+updatemapkolom(N) :-
+  retract(map_element(_,_,1,N)), asserta(map_element('X','-',1,N)),
+  retract(map_element(_,_,2,N)), asserta(map_element('X','-',2,N)),
+  retract(map_element(_,_,3,N)), asserta(map_element('X','-',3,N)),
+  retract(map_element(_,_,4,N)), asserta(map_element('X','-',4,N)),
+  retract(map_element(_,_,5,N)), asserta(map_element('X','-',5,N)),
+  retract(map_element(_,_,6,N)), asserta(map_element('X','-',6,N)),
+  retract(map_element(_,_,7,N)), asserta(map_element('X','-',7,N)),
+  retract(map_element(_,_,8,N)), asserta(map_element('X','-',8,N)),
+  retract(map_element(_,_,9,N)), asserta(map_element('X','-',9,N)),
+  retract(map_element(_,_,10,N)), asserta(map_element('X','-',10,N)),
+  retract(map_element(_,_,11,N)), asserta(map_element('X','-',11,N)),
+  retract(map_element(_,_,12,N)), asserta(map_element('X','-',12,N)).
 
 do(help):- help,!.
 do(map):-map,!.
 do(s) :- s,!.
+do(n) :- n,!.
+do(e) :- e,!.
+do(w) :- w,!.
 do(quit):-quit,!.
+do(gameover) :-gameover,!.
+do(look) :- look,!.
+do(_):- write('Perintah tidak valid!'),nl.
+
+tambahDeadZone :-
+    countMove(A), A == 3,updatemapbaris(2).
+tambahDeadZone :-
+    countMove(A),A == 6,!,updatemapbaris(3).
+tambahDeadZone :-
+    countMove(A),A == 9,!,updatemapkolom(2).
+tambahDeadZone :-
+    countMove(A),A == 12,!,updatemapbaris(4),updatemapkolom(3).
+tambahDeadZone :-
+    countMove(A),A == 15,!,updatemapbaris(5),updatemapkolom(4).
+tambahDeadZone :-
+    countMove(A),A == 19,!,updatemapbaris(6),updatemapbaris(7),updatemapkolom(5).
+tambahDeadZone :-
+    countMove(A),A == 23,!,updatemapbaris(8),updatemapkolom(6),updatemapkolom(7),updatemapkolom(8).
+tambahDeadZone :-
+    countMove(A),A == 27,!,updatemapbaris(9),updatemapkolom(9),updatemapkolom(10),updatemapbaris(10).
+
+gameoverZonaMati :-
+    position(A,B),
+    map_element(C,_,A,B), C == 'X',
+    write('KAMU KALAH! Lain Kali Jangan Mengenai Zona Mati ya!'),nl.
 
 menang :-
   write('                               ___________________________________________'),nl,
   write('                                        Persembahan kami, untuk Anda.     '),nl,
   write('                               ___________________________________________'),nl.
-
-
-
-do(_):- write('Perintah tidak valid!'),nl.
