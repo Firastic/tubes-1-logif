@@ -2,7 +2,7 @@
 health(player,100).
 armor(player,0).
 weapon(player, barehand).
-inInventory(player,).
+inInventory(player,null).
 position(player, 0, 0).
 
 isWeapon(keris).
@@ -52,3 +52,5 @@ armorAmmount(tameng, 15).
 armorAmmount(helm, 10).
 armorAmmount(jimat, 10).
 armorAmmount(batuAkik, 50).
+
+initializePlayer(P) :- health(P,100), armor(P,0),inInventory(P, null).
