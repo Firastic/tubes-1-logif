@@ -148,3 +148,11 @@ positionNPC(tentaraBelanda, 0, 0).
 positionNPC(tentaraJepang, 0, 0).
 positionNPC(antekPKI, 0, 0).
 positionNPC(koruptor, 0, 0).
+inInventory(player, []).
+inInventory(tentaraBelanda, [senapan]).
+inInventory(tentaraJepang, [sumpit]).
+inInventory(antekPKI, [kujang]).
+inInventory(koruptor, [duit]).
+health(player,70).
+armor(player,70).
+weapon(player,[]).

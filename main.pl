@@ -41,17 +41,6 @@ health(tentaraJepang, 100).
 health(antekPKI, 100).
 health(koruptor, 100).
 
-positionNPC(tentaraBelanda, 0, 0).
-positionNPC(tentaraJepang, 0, 0).
-positionNPC(antekPKI, 0, 0).
-positionNPC(koruptor, 0, 0).
-
-inInventory(player, []).
-inInventory(tentaraBelanda, [senapan]).
-inInventory(tentaraJepang, [sumpit]).
-inInventory(antekPKI, [kujang]).
-inInventory(koruptor, [duit]).
-
 damage(keris, 20).
 damage(kujang, 20).
 damage(bambuRuncing, 30).
@@ -675,7 +664,7 @@ checkPlayerLife :-
 dropMedicine :-
     random(1, 4, RanNum),
     dropMedicineHelper(RanNum).
-    
+
 dropMedicineHelper(RanNum) :-
     RanNum = 1,
     random(1, 12, RX),
@@ -723,7 +712,7 @@ dropMedicineHelper(RanNum) :-
 dropArmor :-
     random(1, 5, RanNum),
     dropArmorHelper(RanNum).
-    
+
 dropArmorHelper(RanNum) :-
     RanNum = 1,
     random(1, 12, RX),
@@ -782,7 +771,7 @@ dropArmorHelper(RanNum) :-
 dropWeapon :-
     random(1, 6, RanNum),
     dropWeaponHelper(RanNum).
-    
+
 dropWeaponHelper(RanNum) :-
     RanNum = 1,
     random(1, 12, RX),
