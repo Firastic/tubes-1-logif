@@ -21,7 +21,7 @@ map_element('-','-',2,8).
 map_element('-','-',2,9).
 map_element('-','-',2,10).
 map_element('-','-',2,11).
-map_element('-','-',2,12).
+map_element('X','-',2,12).
 map_element('X','-',3,1).
 map_element('-','-',3,2).
 map_element('-','-',3,3).
@@ -33,7 +33,7 @@ map_element('-','-',3,8).
 map_element('-','-',3,9).
 map_element('-','-',3,10).
 map_element('-','-',3,11).
-map_element('-','-',3,12).
+map_element('X','-',3,12).
 map_element('X','-',4,1).
 map_element('-','-',4,2).
 map_element('-','-',4,3).
@@ -45,7 +45,7 @@ map_element('-','-',4,8).
 map_element('-','-',4,9).
 map_element('-','-',4,10).
 map_element('-','-',4,11).
-map_element('-','-',4,12).
+map_element('X','-',4,12).
 map_element('X','-',5,1).
 map_element('-','-',5,2).
 map_element('-','-',5,3).
@@ -57,7 +57,7 @@ map_element('-','-',5,8).
 map_element('-','-',5,9).
 map_element('-','-',5,10).
 map_element('-','-',5,11).
-map_element('-','-',5,12).
+map_element('X','-',5,12).
 map_element('X','-',6,1).
 map_element('-','-',6,2).
 map_element('-','-',6,3).
@@ -69,7 +69,7 @@ map_element('-','-',6,8).
 map_element('-','-',6,9).
 map_element('-','-',6,10).
 map_element('-','-',6,11).
-map_element('-','-',6,12).
+map_element('X','-',6,12).
 map_element('X','-',7,1).
 map_element('-','-',7,2).
 map_element('-','-',7,3).
@@ -81,7 +81,7 @@ map_element('-','-',7,8).
 map_element('-','-',7,9).
 map_element('-','-',7,10).
 map_element('-','-',7,11).
-map_element('-','-',7,12).
+map_element('X','-',7,12).
 map_element('X','-',8,1).
 map_element('-','-',8,2).
 map_element('-','-',8,3).
@@ -93,7 +93,7 @@ map_element('-','-',8,8).
 map_element('-','-',8,9).
 map_element('-','-',8,10).
 map_element('-','-',8,11).
-map_element('-','-',8,12).
+map_element('X','-',8,12).
 map_element('X','-',9,1).
 map_element('-','-',9,2).
 map_element('-','-',9,3).
@@ -105,7 +105,7 @@ map_element('-','-',9,8).
 map_element('-','-',9,9).
 map_element('-','-',9,10).
 map_element('-','-',9,11).
-map_element('-','-',9,12).
+map_element('X','-',9,12).
 map_element('X','-',10,1).
 map_element('-','-',10,2).
 map_element('-','-',10,3).
@@ -117,7 +117,7 @@ map_element('-','-',10,8).
 map_element('-','-',10,9).
 map_element('-','-',10,10).
 map_element('-','-',10,11).
-map_element('-','-',10,12).
+map_element('X','-',10,12).
 map_element('X','-',11,1).
 map_element('-','-',11,2).
 map_element('-','-',11,3).
@@ -129,7 +129,7 @@ map_element('-','-',11,8).
 map_element('-','-',11,9).
 map_element('-','-',11,10).
 map_element('-','-',11,11).
-map_element('-','-',11,12).
+map_element('X','-',11,12).
 map_element('X','-',12,1).
 map_element('X','-',12,2).
 map_element('X','-',12,3).

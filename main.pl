@@ -137,7 +137,7 @@ game_start:-
       (
         repeat,
         read_term(In, X, []),
-        bacaFakta(X),asserta(X), !
+        bacaFakta(X), !
       ),
       close(In),
 
@@ -174,7 +174,7 @@ s :-  position(A,B), Ax is (A+1),
        retract(position(A,B)),retract(map_element(_,_,A,B)), asserta(map_element('-','-',A,B)),
        asserta(position(Ax,B)),
        retract(map_element(_,_,Ax,B)),asserta(map_element('P','-',Ax,B)),
-       retract(countMove(C)),Cx is C+1, asserta(countMove(Cx)),tambahDeadZone.
+       retract(countMove(C)),Cx is C+1, asserta(countMove(Cx)), tambahDeadZone.
 
 n :- position(A,B), Ax is (A-1),
      (map_element('X',_,Ax,B)),retract(position(A,B)),asserta(position(Ax,B)),
@@ -253,33 +253,38 @@ updatemapkolom(N) :-
   retract(map_element(_,_,11,N)), asserta(map_element('X','-',11,N)),
   retract(map_element(_,_,12,N)), asserta(map_element('X','-',12,N)).
 
+tambahDeadZone :-
+    countMove(A), A == 3,!,updatemapbaris(2).
+tambahDeadZone :-
+    countMove(A), A == 6,!,updatemapbaris(3).
+tambahDeadZone :-
+    countMove(A), A == 9,!,updatemapkolom(2).
+tambahDeadZone :-
+    countMove(A), A == 12,!,updatemapbaris(4),updatemapkolom(3).
+tambahDeadZone :-
+    countMove(A), A == 15,!,updatemapbaris(5),updatemapkolom(4).
+tambahDeadZone :-
+    countMove(A), A == 19,!,updatemapbaris(6),updatemapbaris(7),updatemapkolom(5).
+tambahDeadZone :-
+    countMove(A), A == 23,!,updatemapbaris(8),updatemapkolom(6),updatemapkolom(7),updatemapkolom(8).
+tambahDeadZone :-
+    countMove(A), A == 27,!,updatemapbaris(9),updatemapkolom(9),updatemapkolom(10),updatemapbaris(10).
+tambahDeadZone.
+
 do(help):- help,!.
 do(map):-map,!.
 do(s) :- s,!.
 do(n) :- n,!.
 do(e) :- e,!.
 do(w) :- w,!.
-do(quit):-quit,!.
+do(quit) :-quit,!.
 do(gameover) :-gameover,!.
 do(look) :- look,!.
-do(_):- write('Perintah tidak valid!'),nl.
-
-tambahDeadZone :-
-    countMove(A), A == 3,updatemapbaris(2).
-tambahDeadZone :-
-    countMove(A),A == 6,!,updatemapbaris(3).
-tambahDeadZone :-
-    countMove(A),A == 9,!,updatemapkolom(2).
-tambahDeadZone :-
-    countMove(A),A == 12,!,updatemapbaris(4),updatemapkolom(3).
-tambahDeadZone :-
-    countMove(A),A == 15,!,updatemapbaris(5),updatemapkolom(4).
-tambahDeadZone :-
-    countMove(A),A == 19,!,updatemapbaris(6),updatemapbaris(7),updatemapkolom(5).
-tambahDeadZone :-
-    countMove(A),A == 23,!,updatemapbaris(8),updatemapkolom(6),updatemapkolom(7),updatemapkolom(8).
-tambahDeadZone :-
-    countMove(A),A == 27,!,updatemapbaris(9),updatemapkolom(9),updatemapkolom(10),updatemapbaris(10).
+do(tambahDeadZone) :- tambahDeadZone,!.
+do(countMove(A)) :- countMove(A),!.
+do(updatemapbaris(A)) :- updatemapbaris(A),!.
+do(updatemapkolom(A)) :- updatemapkolom(A),!.
+do(_) :- write('Perintah tidak valid!'),nl.
 
 gameoverZonaMati :-
     position(A,B),
