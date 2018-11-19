@@ -207,24 +207,19 @@ w :-  position(A,B), Bx is (B-1),
       retract(map_element(_,_,A,Bx)),asserta(map_element('P','-',A,Bx)),
       retract(countMove(C)),Cx is C+1, asserta(countMove(Cx)),tambahDeadZone.
 
+look_pos(X,Y) :- map_element(A,B,X,Y), A == 'X' -> write(A).
+look_pos(X,Y) :- map_element(A,B,X,Y) -> write(B).
 
+look_rek(A,B,C) :- C == 10, !.
+look_rek(A,B,C) :-  0 is mod(C,3), !, look_pos(A,B), nl, 
+                    A1 is A+1, B1 is B-2, C1 is C+1, look_rek(A1,B1,C1).
+look_rek(A,B,C) :- look_pos(A,B), B1 is B+1, C1 is C+1, look_rek(A,B1,C1).
 
 look :- position(A,B),
         A1 is A-1,
-        A2 is A+1,
         B1 is B-1,
-        B2 is B+1,
 
-        (map_element(_,C,A1,B1) -> write(C)),
-        (map_element(_,D,A1,B) ,write(D)),
-        (map_element(_,E,A1,B2) -> write(E)),nl,
-        (map_element(_,F,A,B1) -> write(F)),
-        (map_element(_,G,A,B) -> write(G)),
-        (map_element(_,H,A,B2) -> write(H)),nl,
-        (map_element(_,I,A2,B1) -> write(I)),
-        (map_element(_,J,A2,B) -> write(J)),
-        (map_element(_,K,A2,B2) -> write(K)).
-
+        look_rek(A1,B1,1).
 
 updatemapbaris(N) :-
     retract(map_element(_,_,N,1)), asserta(map_element('X','-',N,1)),
