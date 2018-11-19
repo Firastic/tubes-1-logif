@@ -144,3 +144,15 @@ map_element(_,_,12,11).
 map_element(_,_,12,12).
 position(_,_).
 countMove(_).
+inInventory(player,_).
+inInventory(tentaraBelanda,_).
+inInventory(tentaraJepang,_).
+inInventory(antekPKI,_).
+inInventory(koruptor,_).
+armor(player,_).
+health(player,_).
+weapon(player,_).
+positionNPC(tentaraBelanda,_,_).
+positionNPC(tentaraJepang,_,_).
+positionNPC(antekPKI,_,_).
+positionNPC(koruptor,_,_).

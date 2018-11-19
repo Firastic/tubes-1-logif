@@ -37,11 +37,6 @@ isNPC(tentaraJepang).
 isNPC(antekPKI).
 isNPC(koruptor).
 
-positionNPC(tentaraBelanda, 0, 0).
-positionNPC(tentaraJepang, 0, 0).
-positionNPC(antekPKI, 0, 0).
-positionNPC(koruptor, 0, 0).
-
 inInventory(player, []).
 inInventory(tentaraBelanda, [senapan]).
 inInventory(tentaraJepang, [sumpit]).
@@ -201,6 +196,7 @@ call_map(N) :- map1(N), N1 is N+1, call_map(N1).
 map :- call_map(1).
 
 initEnemy :-
+
     forall(isNPC(A), initEnemy(A)).
 
 initEnemy(A) :-
