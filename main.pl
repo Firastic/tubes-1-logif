@@ -244,10 +244,12 @@ n :- position(A,B), Ax is (A-1), moveFromTo(A,B,Ax,B).
 e :- position(A,B), Bx is (B+1), moveFromTo(A,B,A,Bx).
 w :- position(A,B), Bx is (B-1), moveFromTo(A,B,A,Bx).
 
-look_pos(X,Y) :- map_element(A,B,X,Y), A == 'X' -> write(A).
-look_pos(X,Y) :- map_element(A,B,X,Y) -> write(B).
 
-look_rek(A,B,C) :- C == 10, !.
+look_pos(X,Y) :- map_element(A,_,X,Y), A == 'X', !, write(A).
+look_pos(X,Y) :- map_element(_,B,X,Y), B == [], write('-').
+look_pos(X,Y) :- map_element(_,B,X,Y), write(B).
+
+look_rek(_,_,C) :- C == 10, !.
 look_rek(A,B,C) :-  0 is mod(C,3), !, look_pos(A,B), nl, 
                     A1 is A+1, B1 is B-2, C1 is C+1, look_rek(A1,B1,C1).
 look_rek(A,B,C) :- look_pos(A,B), B1 is B+1, C1 is C+1, look_rek(A,B1,C1).
