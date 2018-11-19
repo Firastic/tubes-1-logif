@@ -162,7 +162,7 @@ game_start:-
       close(In),
 
       retract(map_element(_,_,2,2)),
-      asserta(map_element('P','-',2,2)),
+      asserta(map_element('P','P',2,2)),
       initEnemy.
 
 
@@ -236,11 +236,13 @@ moveFromTo(A1,B1,A2,B2) :-
     retract(position(A1,B1)),
     map_element(S, L, A1, B1),
     retract(map_element(S,L,A1,B1)),
-    asserta(map_element('-',L,A1,B1)),
+    delete(L,'P',LX),
+    asserta(map_element('-',LX,A1,B1)),
     asserta(position(A2,B2)),
     map_element(S1,L1,A2,B2),
     retract(map_element(S1,L1,A2,B2)),
-    asserta(map_element('P',L1,A2,B2)),
+    append(L1,['P'],L1X),
+    asserta(map_element('P',L1X,A2,B2)),
     retract(countMove(C)),
     Cx is C+1,
     asserta(countMove(Cx)),
@@ -251,10 +253,17 @@ n :- position(A,B), Ax is (A-1), moveFromTo(A,B,Ax,B).
 e :- position(A,B), Bx is (B+1), moveFromTo(A,B,A,Bx).
 w :- position(A,B), Bx is (B-1), moveFromTo(A,B,A,Bx).
 
-look_pos(X,Y) :- map_element(A,B,X,Y), A == 'X' -> write(A).
-look_pos(X,Y) :- map_element(A,B,X,Y) -> write(B).
+look_pos(X,Y) :- map_element(A,_,X,Y), A == 'X', !, write(A).
+look_pos(X,Y) :- map_element(_,_B,X,Y), _B == [], !, write('-').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member('E',[_B]), !, write('E').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member('M',[_B]), !, write('M').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member('W',[_B]), !, write('W').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member('A',[_B]), !, write('A').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member('O',[_B]), !, write('O').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member('P',[_B]), !, write('P').
 
-look_rek(A,B,C) :- C == 10, !.
+
+look_rek(_,_,C) :- C == 10, !.
 look_rek(A,B,C) :-  0 is mod(C,3), !, look_pos(A,B), nl, 
                     A1 is A+1, B1 is B-2, C1 is C+1, look_rek(A1,B1,C1).
 look_rek(A,B,C) :- look_pos(A,B), B1 is B+1, C1 is C+1, look_rek(A,B1,C1).
