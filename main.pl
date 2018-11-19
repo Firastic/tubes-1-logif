@@ -81,6 +81,7 @@ armorAmmount(batuAkik, 50).
 
 
 start:-
+  game_retractstart,!,
   game_start,!,
   write('##          ###    ##      ##    ###    ##    ##         ##      ##    ###    ##    ##  ######   ##    ## ##    ## ####'),nl,
   write('##         ## ##   ##  ##  ##   ## ##   ###   ##         ##  ##  ##   ## ##   ###   ## ##    ##  ##   ##   ##  ##  ####'),nl,
@@ -133,6 +134,17 @@ help :-
 
 bacaFakta(end_of_file):- !.
 bacaFakta(X):- asserta(X),!,fail.
+retractFakta(end_of_file):- !.
+retractFakta(X):- retract(X),!,fail.
+
+game_retractstart :-
+  open('retractmulaigim.txt',read,In),
+  (
+    repeat,
+    read_term(In, X, []),
+    retractFakta(X), !
+  ),
+  close(In).
 
 game_start:-
   /*
@@ -152,17 +164,18 @@ game_start:-
         read_file(S,T,A,Bx).
   */
 
-      open('mulaigim.txt',read,In),
-      (
-        repeat,
-        read_term(In, X, []),
-        bacaFakta(X), !
-      ),
-      close(In),
+    open('mulaigim.txt',read,In),
+    (
+      repeat,
+      read_term(In, X, []),
+      bacaFakta(X), !
+    ),
+    close(In),
 
-      retract(map_element(_,_,2,2)),
-      asserta(map_element('P',['P'],2,2)),
-      initEnemy.
+    retract(map_element(_,_,2,2)),
+    asserta(map_element('P',['P'],2,2)),
+
+    initEnemy.
 
 
 quit :-
@@ -250,7 +263,7 @@ normalizePosition(X, Y, XN, YN) :-
 moveAllEnemy :-
     forall(isNPC(A), moveEnemy(A)).
 
-moveFromTo(A1,B1,A2,B2) :- 
+moveFromTo(A1,B1,A2,B2) :-
     map_element('X',_,A2,B2),
     retract(position(A1,B1)),
     asserta(position(A2,B2)),
@@ -258,7 +271,7 @@ moveFromTo(A1,B1,A2,B2) :-
     Cx is C+1,
     asserta(countMove(Cx)),!.
 
-moveFromTo(A1,B1,A2,B2) :- 
+moveFromTo(A1,B1,A2,B2) :-
     retract(position(A1,B1)),
     map_element(S, L, A1, B1),
     delete(L,'P',LX),
@@ -291,7 +304,7 @@ look_pos(X,Y) :- map_element(_,_B,X,Y), write('P').
 
 
 look_rek(_,_,C) :- C == 10, !.
-look_rek(A,B,C) :-  0 is mod(C,3), !, look_pos(A,B), nl, 
+look_rek(A,B,C) :-  0 is mod(C,3), !, look_pos(A,B), nl,
                     A1 is A+1, B1 is B-2, C1 is C+1, look_rek(A1,B1,C1).
 look_rek(A,B,C) :- look_pos(A,B), B1 is B+1, C1 is C+1, look_rek(A,B1,C1).
 
@@ -393,6 +406,56 @@ use(Item) :-
   \+member(Item, LI),
   write('Tidak bisa menggunakan barang tersebut'),nl, write('karena barang tersebut tidak ada dalam inventori'), nl.
 
+drop(Item) :-
+  inInventory(player,LI),
+  \+member(Item, LI),!,
+  write('Tidak bisa menjatuhkan barang tersebut'),nl, write('karena barang tersebut tidak ada dalam inventori'), nl.
+
+drop(Item) :-
+  inInventory(player,LI),
+  member(Item,LI),isWeapon(Item),!,write('Anda menjatuhkan senjata '),write(LI),nl,
+  retract(inInventory(player,LI)),
+  delete(LI,Item,NewLI),
+  asserta(inInventory(player,NewLI)),
+  position(A,B),
+  retract(map_element(_,LPetak,A,B)),
+  append(LPetak,['W'],NewLPetak),
+  assert(map_element(_,NewLPetak,A,B)).
+
+drop(Item) :-
+  inInventory(player,LI),
+  member(Item,LI),isMedicine(Item),!,write('Anda menjatuhkan obat '),write(LI),nl,
+  retract(inInventory(player,LI)),
+  delete(LI,Item,NewLI),
+  asserta(inInventory(player,NewLI)),
+  position(A,B),
+  retract(map_element(_,LPetak,A,B)),
+  append(LPetak,['M'],NewLPetak),
+  assert(map_element(_,NewLPetak,A,B)).
+
+drop(Item) :-
+  inInventory(player,LI),
+  member(Item,LI),isArmor(Item),!,write('Anda menjatuhkan pelindung '),write(LI),nl,
+  retract(inInventory(player,LI)),
+  delete(LI,Item,NewLI),
+  asserta(inInventory(player,NewLI)),
+  position(A,B),
+  retract(map_element(_,LPetak,A,B)),
+  append(LPetak,['A'],NewLPetak),
+  assert(map_element(_,NewLPetak,A,B)).
+
+drop(Item) :-
+  inInventory(player,LI),
+  member(Item,LI),isAmmo(Item),!,write('Anda menjatuhkan pelor '),write(LI),nl,
+  retract(inInventory(player,LI)),
+  delete(LI,Item,NewLI),
+  asserta(inInventory(player,NewLI)),
+  position(A,B),
+  retract(map_element(_,LPetak,A,B)),
+  append(LPetak,['A'],NewLPetak),
+  assert(map_element(_,NewLPetak,A,B)).
+
+
 updatemapbaris(N) :-
     retract(map_element(_,X1,N,1)), asserta(map_element('X',X1,N,1)),
     retract(map_element(_,X2,N,2)), asserta(map_element('X',X2,N,2)),
@@ -448,12 +511,13 @@ do(w) :- w, moveAllEnemy,!.
 do(quit) :-quit,!.
 do(gameover) :-gameover,!.
 do(look) :- look,!.
+do(drop) :- drop,!.
 do(tambahDeadZone) :- tambahDeadZone,!.
 do(countMove(A)) :- countMove(A),!.
 do(updatemapbaris(A)) :- updatemapbaris(A),!.
 do(updatemapkolom(A)) :- updatemapkolom(A),!.
 do(status) :- status,!.
-do(use(Item)) :- use(Item),!. 
+do(use(Item)) :- use(Item),!.
 do(_) :- write('Perintah tidak valid!'),nl.
 
 gameoverZonaMati :-
