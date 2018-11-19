@@ -179,6 +179,8 @@ map1(N):-
 call_map(N) :- N == 13, !.
 call_map(N) :- map1(N), N1 is N+1, call_map(N1).
 
+map :- call_map(1).
+
 initEnemy :-
     isNPC(A),
     positionNPC(A, X, Y),
@@ -214,12 +216,6 @@ moveEnemy(A) :-
 moveAllEnemy :-
     isNPC(A),
     moveEnemy(A).
-
-map :-
-  map1(1),map1(2),map1(3),map1(4),map1(5),map1(6),map1(7),map1(8),map1(9),
-  map1(10),map1(11),map1(12).
-
-map :- call_map(1).
 
 moveFromTo(A1,B1,A2,B2) :- 
     map_element('X',_,A2,B2),
