@@ -9,9 +9,8 @@
 :-dynamic(weapon/2).
 :-dynamic(inInventory/2).
 
-health(player,100).
 armor(player,0).
-weapon(player, barehand).
+weapon(player, none).
 
 isWeapon(keris).
 isWeapon(kujang).
@@ -19,7 +18,6 @@ isWeapon(bambuRuncing).
 isWeapon(senapan).
 isWeapon(sumpit).
 isWeapon(duit).
-isWeapon(barehand). /*Default one */
 
 isArmor(tameng).
 isArmor(zirah).
@@ -37,13 +35,23 @@ isNPC(tentaraJepang).
 isNPC(antekPKI).
 isNPC(koruptor).
 
+health(player,100).
+health(tentaraBelanda, 100).
+health(tentaraJepang, 100).
+health(antekPKI, 100).
+health(koruptor, 100).
+
+positionNPC(tentaraBelanda, 0, 0).
+positionNPC(tentaraJepang, 0, 0).
+positionNPC(antekPKI, 0, 0).
+positionNPC(koruptor, 0, 0).
+
 inInventory(player, []).
 inInventory(tentaraBelanda, [senapan]).
 inInventory(tentaraJepang, [sumpit]).
 inInventory(antekPKI, [kujang]).
 inInventory(koruptor, [duit]).
 
-damage(barehand, 5).
 damage(keris, 20).
 damage(kujang, 20).
 damage(bambuRuncing, 30).
@@ -59,7 +67,6 @@ weaponAmmo(kujang, none).
 weaponAmmo(bambuRuncing, none).
 weaponAmmo(senapan, peluru).
 weaponAmmo(sumpit, anaksumpit).
-weaponAmmo(barehand, none).
 weaponAmmo(duit, none).
 
 medicine(panadol, 20).
@@ -72,8 +79,6 @@ armorAmmount(tameng, 15).
 armorAmmount(helm, 10).
 armorAmmount(jimat, 10).
 armorAmmount(batuAkik, 50).
-
-
 
 start:-
   game_retractstart,!,
@@ -100,7 +105,7 @@ start:-
   repeat,
   write('>'), read(A),
   do(A),nl,
-  (A == quit ; gameoverZonaMati).
+  (A == quit ; gameoverZonaMati; checkPlayerLife).
 
 help :-
   write('Perintah yang dapat Anda jalankan:                                         '),nl,
@@ -221,17 +226,72 @@ moveEnemy(A) :-
     delete(L, A, NL),
     write(NL), nl,
     asserta(map_element(S, NL, X, Y)),
-    random(-1, 1, NewDX),
-    random(-1, 1, NewDY),
-    NewX is (X + NewDX),
-    NewY is (Y + NewDY),
-    write(NewX), write('spasi'), write(NewY), nl,
-    normalizePosition(NewX, NewY, NNewX, NNewY),
-    write(NNewX), write('spasi'), write(NNewY), nl,
+    moveEnemyHelper(X, Y, NNewX, NNewY),
+    print(NNewX), print('spasi'), print(NNewY), nl,
     asserta(positionNPC(A, NNewX, NNewY)),
     append(NL, [A], NewList),
     write(NewList), nl,
     asserta(map_element(S, NewList, X, Y)).
+
+moveEnemyHelper(X, Y, NewX, NewY) :-
+    X = 1, Y = 1,
+    isEnemyHere(X, Y + 1),
+    isEnemyHere(X + 1, Y),
+    isEnemyHere(X + 1, Y + 1),
+    NewX is X, NewY is Y.
+
+moveEnemyHelper(X, Y, NewX, NewY) :-
+    X = 1, Y = 12,
+    isEnemyHere(X, Y - 1),
+    isEnemyHere(X + 1, Y),
+    isEnemyHere(X + 1, Y - 1),
+    NewX is X, NewY is Y.
+
+moveEnemyHelper(X, Y, NewX, NewY) :-
+    X = 12, Y = 1,
+    isEnemyHere(X, Y + 1),
+    isEnemyHere(X - 1, Y),
+    isEnemyHere(X - 1, Y + 1),
+    NewX is X, NewY is Y.
+
+moveEnemyHelper(X, Y, NewX, NewY) :-
+    X = 12, Y = 12,
+    isEnemyHere(X, Y - 1),
+    isEnemyHere(X - 1, Y),
+    isEnemyHere(X - 1, Y - 1),
+    NewX is X, NewY is Y.
+
+moveEnemyHelper(X, Y, NewX, NewY) :-
+    random(-1, 1, NewDX),
+    random(-1, 1, NewDY),
+    NX is X + NewDX, NY is Y + NewDY,
+    normalizePosition(NX, NY, NNewX, NNewY),
+    \+isEnemyHere(NNewX, NNewY),
+    NewX is NNewX, NewY is NNewY.
+
+moveEnemyHelper(X, Y, NewX, NewY) :-
+    random(-1, 1, NewDX),
+    random(-1, 1, NewDY),
+    NX is X + NewDX, NY is Y + NewDY,
+    normalizePosition(NX, NY, NNewX, NNewY),
+    isEnemyHere(NNewX, NNewY),
+    moveEnemyHelper(X, Y, NewX, NewY).
+
+isEnemyHere(X, Y) :-
+    map_element(_, L, X, Y),
+    member(tentaraBelanda, L).
+
+isEnemyHere(X, Y) :-
+    map_element(_, L, X, Y),
+    member(tentaraJepang, L).
+
+isEnemyHere(X, Y) :-
+    map_element(_, L, X, Y),
+    member(antekPKI, L).
+
+isEnemyHere(X, Y) :-
+    map_element(_, L, X, Y),
+    member(koruptor, L).
 
 normalizePosition(X, Y, XN, YN) :-
     X < 1,
@@ -290,14 +350,28 @@ w :- position(A,B), Bx is (B-1), moveFromTo(A,B,A,Bx).
 
 look_pos(X,Y) :- map_element(A,_,X,Y), A == 'X', !, write(A).
 look_pos(X,Y) :- map_element(_,_B,X,Y), _B == [], !, write('-').
-look_pos(X,Y) :- map_element(_,_B,X,Y), member('E',[_B]), !, write('E').
-look_pos(X,Y) :- map_element(_,_B,X,Y), member('M',[_B]), !, write('M').
-look_pos(X,Y) :- map_element(_,_B,X,Y), member('W',[_B]), !, write('W').
-look_pos(X,Y) :- map_element(_,_B,X,Y), member('A',[_B]), !, write('A').
-look_pos(X,Y) :- map_element(_,_B,X,Y), member('O',[_B]), !, write('O').
-look_pos(X,Y) :- map_element(_,_B,X,Y), member('P',[_B]), !, write('P').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member('E',_B), !, write('E').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(tentaraBelanda,_B), !, write('M').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(tentaraJepang,_B), !, write('M').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(antekPKI,_B), !, write('M').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(koruptor,_B), !, write('M').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(keris,_B), !, write('W').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(kujang,_B), !, write('W').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(bambuRuncing,_B), !, write('W').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(senapan,_B), !, write('W').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(sumpit,_B), !, write('W').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(duit,_B), !, write('W').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(tameng,_B), !, write('A').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(zirah,_B), !, write('A').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(helm,_B), !, write('A').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(jimat,_B), !, write('A').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(batuAkik,_B), !, write('A').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(panadol,_B), !, write('O').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(obhCombi,_B), !, write('O').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(minyakKayuPutih,_B), !, write('O').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(jamu,_B), !, write('O').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member('P',_B), !, write('P').
 look_pos(X,Y) :- map_element(_,_B,X,Y), write('P').
-
 
 look_rek(_,_,C) :- C == 10, !.
 look_rek(A,B,C) :-  0 is mod(C,3), !, look_pos(A,B), nl,
@@ -322,6 +396,32 @@ status :-
 tulisInventory([])     :- write(' -Kosong-'), nl, !.
 tulisInventory([H|[]]) :- write(' -'),write(H), nl,!.
 tulisInventory([H|T])  :- write(' -'),write(H),nl, tulisInventory(T).
+
+take(Item) :-
+    position(X, Y),
+    write(X), write(' '), write(Y), nl,
+    map_element(S, L, X, Y),
+    member(Item, L), !,
+    write(Item), write(' '), write(L), nl,
+    inInventory(player, LI),
+    write(LI), nl,
+    retract(inInventory(player, LI)),
+    write(LI), nl,
+    append(LI, [Item], NLI),
+    write(NLI), nl,
+    asserta(inInventory(player, NLI)),
+    retract(map_element(S, L, X, Y)),
+    delete(L, Item, LNEW),
+    asserta(map_element(S, LNEW, X, Y)),
+    write(Item), write(' sudah diambil! Hebat Kamu!'), nl.
+
+take(Item) :-
+    position(X, Y),
+    write(X), write(' '), write(Y), nl,
+    map_element(_, L, X, Y),
+    write(Item), write(' '), write(L), nl,
+    \+member(Item, L), !,
+    write('Tidak ada '), write(Item), write(' di sini! Miskin!'), nl.
 
 use(Item) :-
   inInventory(player,LI),
@@ -372,7 +472,7 @@ use(Item) :-
   isWeapon(Item),
   weapon(player,Old),
   delete(LI,Item,NewLI),
-  Old == barehand,!,
+  Old == none,!,
   retract(weapon(player,Old)),
   asserta(weapon(player,Item)),
   retract(inInventory(player,LI)),
@@ -451,6 +551,331 @@ drop(Item) :-
   append(LPetak,['A'],NewLPetak),
   assert(map_element(_,NewLPetak,A,B)).
 
+checkEnemy :-
+    position(X, Y),
+    map_element(_, L, X, Y),
+    member(tentaraBelanda, L).
+
+checkEnemy :-
+    position(X, Y),
+    map_element(_, L, X, Y),
+    member(tentaraJepang, L).
+
+checkEnemy :-
+    position(X, Y),
+    map_element(_, L, X, Y),
+    member(antekPKI, L).
+
+checkEnemy :-
+    position(X, Y),
+    map_element(_, L, X, Y),
+    member(koruptor, L).
+
+attack :-
+    position(X, Y),
+    map_element(S, L, X, Y),
+    checkEnemy,
+    attackHelper1,
+    write('ATTACK SEQUENCE 1'), nl.
+
+attack :-
+    position(X, Y),
+    map_element(S, L, X, Y),
+    \+checkEnemy,
+    write('Tidak ada musuh disini!'), nl.
+
+attackHelper1 :-
+    weapon(player, WEAPON_PLAYER),
+    \+WEAPON_PLAYER = none,
+    attackHelper2(WEAPON_PLAYER).
+
+attackHelper1 :-
+    weapon(player, WEAPON_PLAYER),
+    WEAPON_PLAYER = none,
+    write('Kamu tidak memegang senjata! Cari mati kamu?'), nl.
+
+attackHelper2(WEAPON_PLAYER) :-
+    weaponAmmo(WEAPON_PLAYER, AMMO_TYPE),
+    AMMO_TYPE = none,
+    position(X, Y),
+    positionNPC(NPC, X, Y),
+    write('Kamu menyerang '), write(NPC), write('! Kasihan dia!'), nl,
+    health(NPC, CURRENT_HEALTH),
+    retract(health(NPC, CURRENT_HEALTH)),
+    damage(WEAPON_PLAYER, DAMAGE_PLAYER),
+    NEW_HEALTH is CURRENT_HEALTH - DAMAGE_PLAYER,
+    asserta(health(NPC, CURRENT_HEALTH)),
+    write('Nyawa '), write(NPC), write(' berkurang '), write(DAMAGE_PLAYER), write('!'), nl,
+    attackHelper3.
+
+attackHelper2(WEAPON_PLAYER) :-
+    weaponAmmo(WEAPON_PLAYER, AMMO_TYPE),
+    \+AMMO_TYPE = none,
+    inInventory(player, INVENTORY_LIST),
+    member(AMMO_TYPE, INVENTORY_LIST),
+    retract(inInventory(player, INVENTORY_LIST)),
+    delete(INVENTORY_LIST, AMMO_TYPE, INVENTORY_LIST_NEW),
+    asserta(inInventory(player, INVENTORY_LIST_NEW)),
+    write(AMMO_TYPE), write(' berkurang 1!'), nl,
+    position(X, Y),
+    positionNPC(NPC, X, Y),
+    write('Kamu menyerang '), write(NPC), write('! Kasihan dia!'), nl,
+    health(NPC, CURRENT_HEALTH),
+    retract(health(NPC, CURRENT_HEALTH)),
+    damage(WEAPON_PLAYER, DAMAGE_PLAYER),
+    NEW_HEALTH is CURRENT_HEALTH - DAMAGE_PLAYER,
+    asserta(health(NPC, CURRENT_HEALTH)),
+    write('Nyawa '), write(NPC), write(' berkurang '), write(DAMAGE_PLAYER), write('!'), nl,
+    attackHelper3.
+
+attackHelper2(WEAPON_PLAYER) :-
+    weaponAmmo(WEAPON_PLAYER, AMMO_TYPE),
+    \+AMMO_TYPE = none,
+    inInventory(player, INVENTORY_LIST),
+    \+member(AMMO_TYPE, INVENTORY_LIST),
+    write('Kamu tidak memiliki '), write(AMMO_TYPE), write('! Rasain!'),
+    attackHelper3.
+
+attackHelper3 :-
+    position(X, Y),
+    positionNPC(NPC, X, Y),
+    health(NPC, HEALTH_NPC),
+    HEALTH_NPC > 0,
+    inInventory(NPC, [WEAPON_NPC|TAIL]),
+    damage(WEAPON_NPC, DAMAGE_NPC),
+    write(NPC), write(' menyerang kamu! Nyawa kamu berkurang '), write(DAMAGE_NPC), write('!'), nl,
+    retract(health(player, CURRENT_HEALTH)),
+    NEW_HEALTH is CURRENT_HEALTH - DAMAGE_NPC,
+    asserta(health(player, NEW_HEALTH)).
+
+attackHelper3 :-
+    position(X, Y),
+    positionNPC(NPC, X, Y),
+    health(NPC, HEALTH_NPC),
+    \+HEALTH_NPC > 0,
+    write(NPC), write(' telah kamu bunuh! Dia menjatuhkan hal berikut!'), nl,
+    inInventory(NPC, INVENTORY_LIST),
+    write(INVENTORY_LIST),
+    drop(NPC).
+
+dropNPC(NPC) :-
+    inInventory(NPC, INVENTORY_LIST),
+    retract(NPC, INVENTORY_LIST),
+    positionNPC(NPC, X, Y),
+    map_element(S, L, X, Y),
+    retract(map_element(S, L, X, Y)),
+    append(L, INVENTORY_LIST, NL),
+    asserta(map_element(S, NL, X, Y)).
+
+checkPlayerLife :-
+    health(player, CURRENT_HEALTH),
+    CURRENT_HEALTH < 0,
+    write('Kamu mati! Permainan selesai!'), nl.
+
+dropMedicine :-
+    random(1, 4, RanNum),
+    dropMedicineHelper(RanNum).
+    
+dropMedicineHelper(RanNum) :-
+    RanNum = 1,
+    random(1, 12, RX),
+    random(1, 12, RY),
+    goodRandomizer(RX, RY, RanX, RanY),
+    map_element(S, L, RanX, RanY),
+    retract(map_element(S, L, RanX, RanY)),
+    append(L, [panadol], NewL),
+    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
+    asserta(map_element(S, NewL, RanX, RanY)).
+
+dropMedicineHelper(RanNum) :-
+    RanNum = 2,
+    random(1, 12, RX),
+    random(1, 12, RY),
+    goodRandomizer(RX, RY, RanX, RanY),
+    map_element(S, L, RanX, RanY),
+    retract(map_element(S, L, RanX, RanY)),
+    append(L, [obhCombi], NewL),
+    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
+    asserta(map_element(S, NewL, RanX, RanY)).
+
+dropMedicineHelper(RanNum) :-
+    RanNum = 3,
+    random(1, 12, RX),
+    random(1, 12, RY),
+    goodRandomizer(RX, RY, RanX, RanY),
+    map_element(S, L, RanX, RanY),
+    retract(map_element(S, L, RanX, RanY)),
+    append(L, [minyakKayuPutih], NewL),
+    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
+    asserta(map_element(S, NewL, RanX, RanY)).
+
+dropMedicineHelper(RanNum) :-
+    RanNum = 4,
+    random(1, 12, RX),
+    random(1, 12, RY),
+    goodRandomizer(RX, RY, RanX, RanY),
+    map_element(S, L, RanX, RanY),
+    retract(map_element(S, L, RanX, RanY)),
+    append(L, [jamu], NewL),
+    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
+    asserta(map_element(S, NewL, RanX, RanY)).
+
+dropArmor :-
+    random(1, 5, RanNum),
+    dropArmorHelper(RanNum).
+    
+dropArmorHelper(RanNum) :-
+    RanNum = 1,
+    random(1, 12, RX),
+    random(1, 12, RY),
+    goodRandomizer(RX, RY, RanX, RanY),
+    map_element(S, L, RanX, RanY),
+    retract(map_element(S, L, RanX, RanY)),
+    append(L, [tameng], NewL),
+    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
+    asserta(map_element(S, NewL, RanX, RanY)).
+
+dropArmorHelper(RanNum) :-
+    RanNum = 2,
+    random(1, 12, RX),
+    random(1, 12, RY),
+    goodRandomizer(RX, RY, RanX, RanY),
+    map_element(S, L, RanX, RanY),
+    retract(map_element(S, L, RanX, RanY)),
+    append(L, [zirah], NewL),
+    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
+    asserta(map_element(S, NewL, RanX, RanY)).
+
+dropArmorHelper(RanNum) :-
+    RanNum = 3,
+    random(1, 12, RX),
+    random(1, 12, RY),
+    goodRandomizer(RX, RY, RanX, RanY),
+    map_element(S, L, RanX, RanY),
+    retract(map_element(S, L, RanX, RanY)),
+    append(L, [helm], NewL),
+    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
+    asserta(map_element(S, NewL, RanX, RanY)).
+
+dropArmorHelper(RanNum) :-
+    RanNum = 4,
+    random(1, 12, RX),
+    random(1, 12, RY),
+    goodRandomizer(RX, RY, RanX, RanY),
+    map_element(S, L, RanX, RanY),
+    retract(map_element(S, L, RanX, RanY)),
+    append(L, [jimat], NewL),
+    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
+    asserta(map_element(S, NewL, RanX, RanY)).
+
+dropArmorHelper(RanNum) :-
+    RanNum = 5,
+    random(1, 12, RX),
+    random(1, 12, RY),
+    goodRandomizer(RX, RY, RanX, RanY),
+    map_element(S, L, RanX, RanY),
+    retract(map_element(S, L, RanX, RanY)),
+    append(L, [batuAkik], NewL),
+    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
+    asserta(map_element(S, NewL, RanX, RanY)).
+
+dropWeapon :-
+    random(1, 6, RanNum),
+    dropWeaponHelper(RanNum).
+    
+dropWeaponHelper(RanNum) :-
+    RanNum = 1,
+    random(1, 12, RX),
+    random(1, 12, RY),
+    goodRandomizer(RX, RY, RanX, RanY),
+    map_element(S, L, RanX, RanY),
+    retract(map_element(S, L, RanX, RanY)),
+    append(L, [keris], NewL),
+    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
+    asserta(map_element(S, NewL, RanX, RanY)).
+
+dropWeaponHelper(RanNum) :-
+    RanNum = 2,
+    random(1, 12, RX),
+    random(1, 12, RY),
+    goodRandomizer(RX, RY, RanX, RanY),
+    map_element(S, L, RanX, RanY),
+    retract(map_element(S, L, RanX, RanY)),
+    append(L, [kujang], NewL),
+    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
+    asserta(map_element(S, NewL, RanX, RanY)).
+
+dropWeaponHelper(RanNum) :-
+    RanNum = 3,
+    random(1, 12, RX),
+    random(1, 12, RY),
+    goodRandomizer(RX, RY, RanX, RanY),
+    map_element(S, L, RanX, RanY),
+    retract(map_element(S, L, RanX, RanY)),
+    append(L, [bambuRuncing], NewL),
+    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
+    asserta(map_element(S, NewL, RanX, RanY)).
+
+dropWeaponHelper(RanNum) :-
+    RanNum = 4,
+    random(1, 12, RX),
+    random(1, 12, RY),
+    goodRandomizer(RX, RY, RanX, RanY),
+    map_element(S, L, RanX, RanY),
+    retract(map_element(S, L, RanX, RanY)),
+    append(L, [senapan], NewL),
+    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
+    asserta(map_element(S, NewL, RanX, RanY)).
+
+dropWeaponHelper(RanNum) :-
+    RanNum = 5,
+    random(1, 12, RX),
+    random(1, 12, RY),
+    goodRandomizer(RX, RY, RanX, RanY),
+    map_element(S, L, RanX, RanY),
+    retract(map_element(S, L, RanX, RanY)),
+    append(L, [sumpit], NewL),
+    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
+    asserta(map_element(S, NewL, RanX, RanY)).
+
+dropWeaponHelper(RanNum) :-
+    RanNum = 6,
+    random(1, 12, RX),
+    random(1, 12, RY),
+    goodRandomizer(RX, RY, RanX, RanY),
+    map_element(S, L, RanX, RanY),
+    retract(map_element(S, L, RanX, RanY)),
+    append(L, [duit], NewL),
+    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
+    asserta(map_element(S, NewL, RanX, RanY)).
+
+dropRandomizer :-
+    random(1, 3, RanNum),
+    dropRandomizerHelper(RanNum).
+
+dropRandomizerHelper(RanNum) :-
+    RanNum = 1,
+    dropArmor.
+
+dropRandomizerHelper(RanNum) :-
+    RanNum = 2,
+    dropWeapon.
+
+dropRandomizerHelper(RanNum) :-
+    RanNum = 3,
+    dropMedicine.
+
+goodRandomizer(X, Y, XN, YN) :-
+    map_element(S, _, X, Y),
+    S = 'X',
+    random(1, 12, XR),
+    random(1, 12, YR),
+    goodRandomizer(XR, YR, XN, YN).
+
+goodRandomizer(X, Y, XN, YN) :-
+    map_element(S, _, X, Y),
+    \+S = 'X',
+    XN = X, YN = Y.
 
 updatemapbaris(N) :-
     retract(map_element(_,X1,N,1)), asserta(map_element('X',X1,N,1)),
@@ -500,10 +925,10 @@ tambahDeadZone.
 
 do(help):- help,!.
 do(map):-map,!.
-do(s) :- s, moveAllEnemy,!.
-do(n) :- n, moveAllEnemy,!.
-do(e) :- e, moveAllEnemy,!.
-do(w) :- w, moveAllEnemy,!.
+do(s) :- s, moveAllEnemy, dropRandomizer, !.
+do(n) :- n, moveAllEnemy, dropRandomizer, !.
+do(e) :- e, moveAllEnemy, dropRandomizer, !.
+do(w) :- w, moveAllEnemy, dropRandomizer, !.
 do(quit) :-quit,!.
 do(gameover) :-gameover,!.
 do(look) :- look,!.
@@ -514,6 +939,8 @@ do(updatemapbaris(A)) :- updatemapbaris(A),!.
 do(updatemapkolom(A)) :- updatemapkolom(A),!.
 do(status) :- status,!.
 do(use(Item)) :- use(Item),!.
+do(take(Item)) :- take(Item),!.
+do(attack) :- attack,!.
 do(_) :- write('Perintah tidak valid!'),nl.
 
 gameoverZonaMati :-
