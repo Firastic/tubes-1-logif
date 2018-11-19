@@ -155,4 +155,4 @@ inInventory(antekPKI, [kujang]).
 inInventory(koruptor, [duit]).
 health(player,70).
 armor(player,70).
-weapon(player,[]).
+weapon(player,none).
