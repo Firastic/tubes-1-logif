@@ -162,9 +162,10 @@ map1(N):-
   (map_element(K,_,N,11) -> write(K)),
   (map_element(L,_,N,12) -> write(L)),nl.
 
-map :-
-  map1(1),map1(2),map1(3),map1(4),map1(5),map1(6),map1(7),map1(8),map1(9),
-  map1(10),map1(11),map1(12).
+call_map(N) :- N == 13, !.
+call_map(N) :- map1(N), N1 is N+1, call_map(N1).
+
+map :- call_map(1).
 
 s :- position(A,B), Ax is (A+1),
      (map_element('X',_,Ax,B)),retract(position(A,B)),asserta(position(Ax,B)),
