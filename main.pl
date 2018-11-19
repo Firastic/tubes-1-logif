@@ -3,18 +3,18 @@
 :-dynamic(map_element/4).
 :-dynamic(position/2).
 :-dynamic(countMove/1).
+:-dynamic(positionNPC/3).
 
 health(player,100).
 armor(player,0).
 weapon(player, barehand).
-inInventory(player,i).
-position(player, 0, 0).
 
 isWeapon(keris).
 isWeapon(kujang).
 isWeapon(bambuRuncing).
-isWeapon(panah).
+isWeapon(senapan).
 isWeapon(sumpit).
+isWeapon(duit).
 isWeapon(barehand). /*Default one */
 
 isArmor(tameng).
@@ -33,19 +33,32 @@ isNPC(tentaraJepang).
 isNPC(antekPKI).
 isNPC(koruptor).
 
+positionNPC(tentaraBelanda, 0, 0).
+positionNPC(tentaraJepang, 0, 0).
+positionNPC(antekPKI, 0, 0).
+positionNPC(koruptor, 0, 0).
+
+inInventory(player, []).
+inInventory(tentaraBelanda, [senapan]).
+inInventory(tentaraJepang, [sumpit]).
+inInventory(antekPKI, [kujang]).
+inInventory(koruptor, [duit]).
+
 damage(barehand, 5).
 damage(keris, 20).
 damage(kujang, 20).
 damage(bambuRuncing, 30).
-damage(panah, 50).
+damage(senapan, 50).
 damage(sumpit, 40).
+damage(duit, 30).
 
 ammo(keris, none).
 ammo(kujang, none).
 ammo(bambuRuncing, none).
-ammo(panah, anakpanah).
+ammo(senapan, peluru).
 ammo(sumpit, anaksumpit).
 ammo(barehand, none).
+ammo(duit, none).
 
 medicine(panadol, 20).
 medicine(obhCombi, 30).
@@ -142,7 +155,8 @@ game_start:-
       close(In),
 
       retract(map_element(_,_,2,2)),
-      asserta(map_element('P','-',2,2)).
+      asserta(map_element('P','-',2,2)),
+      initEnemy.
 
 
 quit :-
@@ -165,16 +179,69 @@ map1(N):-
 call_map(N) :- N == 13, !.
 call_map(N) :- map1(N), N1 is N+1, call_map(N1).
 
+initEnemy :-
+    isNPC(A),
+    positionNPC(A, X, Y),
+    retract(positionNPC(A, X, Y)),
+    random(2, 11, NewX),
+    random(2, 11, NewY),
+    asserta(positionNPC(A, NewX, NewY)),
+    map_element(S, L, NewX, NewY),
+    retract(map_element(S, L, NewX, NewY)),
+    append(L, [A], NewList),
+    write(NewList), nl,
+    asserta(map_element(S, NewList, NewX, NewY)),
+    write(NewList),
+    write(' di ('),
+    write(NewX),
+    write(', '),
+    write(NewY),
+    write(').'), nl.
+
+moveEnemy(A) :-
+    position(A, X, Y),
+    retract(positionNPC(A, X, Y)),
+    map_element(S, L, X, Y),
+    retract(map_element(S, L, X, Y)),
+    random(-1, 1, NewDX),
+    random(-1, 1, NewDY),
+    NewX is (X + NewDX),
+    NewY is (Y + NewDY),
+    asserta(A, positionNPC(A, NewX, NewY)),
+    append(L, [A], NewList),
+    assert(map_element(S, NewList, X, Y)).
+
+moveAllEnemy :-
+    isNPC(A),
+    moveEnemy(A).
+
+map :-
+  map1(1),map1(2),map1(3),map1(4),map1(5),map1(6),map1(7),map1(8),map1(9),
+  map1(10),map1(11),map1(12).
+
 map :- call_map(1).
 
-moveFromTo(A1,B1,A2,B2) :- map_element('X',_,A2,B2), retract(position(A1,B1)),asserta(position(A2,B2)),
-     retract(countMove(C)),Cx is C+1, asserta(countMove(Cx)).
+moveFromTo(A1,B1,A2,B2) :- 
+    map_element('X',_,A2,B2),
+    retract(position(A1,B1)),
+    asserta(position(A2,B2)),
+    retract(countMove(C)),
+    Cx is C+1,
+    asserta(countMove(Cx)).
 
-moveFromTo(A1,B1,A2,B2) :- retract(position(A1,B1)),retract(map_element(_,_,A1,B1)), asserta(map_element('-','-',A1,B1)),
-       asserta(position(A2,B2)),
-       retract(map_element(_,_,A2,B2)),asserta(map_element('P','-',A2,B2)),
-       retract(countMove(C)),Cx is C+1, asserta(countMove(Cx)), tambahDeadZone.
-
+moveFromTo(A1,B1,A2,B2) :- 
+    retract(position(A1,B1)),
+    map_element(S, L, A1, B1),
+    retract(map_element(S,L,A1,B1)),
+    asserta(map_element('-',L,A1,B1)),
+    asserta(position(A2,B2)),
+    map_element(S1,L1,A2,B2),
+    retract(map_element(S1,L1,A2,B2)),
+    asserta(map_element('P',L1,A2,B2)),
+    retract(countMove(C)),
+    Cx is C+1,
+    asserta(countMove(Cx)),
+    tambahDeadZone.
 
 s :- position(A,B), Ax is (A+1), moveFromTo(A,B,Ax,B).
 n :- position(A,B), Ax is (A-1), moveFromTo(A,B,Ax,B).
@@ -192,7 +259,6 @@ look_rek(A,B,C) :- look_pos(A,B), B1 is B+1, C1 is C+1, look_rek(A,B1,C1).
 look :- position(A,B),
         A1 is A-1,
         B1 is B-1,
-
         look_rek(A1,B1,1).
 
 updatemapbaris(N) :-
