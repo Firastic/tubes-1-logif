@@ -4,6 +4,10 @@
 :-dynamic(position/2).
 :-dynamic(countMove/1).
 :-dynamic(positionNPC/3).
+:-dynamic(armor/2).
+:-dynamic(health/2).
+:-dynamic(weapon/2).
+:-dynamic(inInventory/2).
 
 health(player,100).
 armor(player,0).
@@ -52,13 +56,16 @@ damage(senapan, 50).
 damage(sumpit, 40).
 damage(duit, 30).
 
-ammo(keris, none).
-ammo(kujang, none).
-ammo(bambuRuncing, none).
-ammo(senapan, peluru).
-ammo(sumpit, anaksumpit).
-ammo(barehand, none).
-ammo(duit, none).
+isAmmo(peluru).
+isAmmo(anaksumpit).
+
+weaponAmmo(keris, none).
+weaponAmmo(kujang, none).
+weaponAmmo(bambuRuncing, none).
+weaponAmmo(senapan, peluru).
+weaponAmmo(sumpit, anaksumpit).
+weaponAmmo(barehand, none).
+weaponAmmo(duit, none).
 
 medicine(panadol, 20).
 medicine(obhCombi, 30).
@@ -257,6 +264,99 @@ look :- position(A,B),
         B1 is B-1,
         look_rek(A1,B1,1).
 
+status :-
+    inInventory(player,LI),
+    health(player,H),
+    armor(player,A),
+    weapon(player,W),
+    write('Health : '), write(H), nl,
+    write('Armor  : '), write(A), nl,
+    write('Weapon : '), write(W), nl,
+    write('Isi Inventori : '),nl, tulisInventory(LI).
+
+tulisInventory([])     :- write(' -Kosong-'), nl, !.
+tulisInventory([H|[]]) :- write(' -'),write(H), nl,!.
+tulisInventory([H|T])  :- write(' -'),write(H),nl, tulisInventory(T).
+
+use(Item) :-
+  inInventory(player,LI),
+  member(Item, LI),
+  isArmor(Item),
+  armor(player,X),
+  armorAmmount(Item,ArmorAdded),
+  delete(LI,Item,NewLI),
+  NewArmor is X + ArmorAdded,
+  retract(armor(player,X)),
+  asserta(armor(player,NewArmor)),
+  retract(inInventory(player,LI)),
+  asserta(inInventory(player,NewLI)),
+  write('Armor anda bertambah sebesar '), write(ArmorAdded), nl.
+
+use(Item) :-
+  inInventory(player,LI),
+  member(Item, LI),
+  isMedicine(Item),
+  health(player,HPAwal),
+  medicine(Item,HealthAdded),
+  delete(LI,Item,NewLI),
+  NewHealth is (HPAwal + HealthAdded),
+  NewHealth > 100, !,
+  retract(health(player,HPAwal)),
+  asserta(health(player,100)),
+  retract(inInventory(player,LI)),
+  asserta(inInventory(player,NewLI)),
+  write('Health anda bertambah sebesar '), write(HealthAdded), nl.
+
+use(Item) :-
+  inInventory(player,LI),
+  member(Item, LI),
+  isMedicine(Item),
+  health(player,X),
+  medicine(Item,HealthAdded),
+  delete(LI,Item,NewLI),
+  NewHealth is X + HealthAdded,
+  retract(health(player,X)),
+  asserta(health(player,NewHealth)),
+  retract(inInventory(player,LI)),
+  asserta(inInventory(player,NewLI)),
+  write('Health anda bertambah sebesar '), write(HealthAdded), nl.
+
+use(Item) :-
+  inInventory(player,LI),
+  member(Item, LI),
+  isWeapon(Item),
+  weapon(player,Old),
+  delete(LI,Item,NewLI),
+  Old == barehand,!,
+  retract(weapon(player,Old)),
+  asserta(weapon(player,Item)),
+  retract(inInventory(player,LI)),
+  asserta(inInventory(player,NewLI)),
+  write('Anda kini menggunakan '), write(Item), write(' sebagai senjata anda'), nl.
+
+use(Item) :-
+  inInventory(player,LI),
+  member(Item, LI),
+  isWeapon(Item),
+  weapon(player,Old),
+  delete(LI,Item,TempLI),
+  append(TempLI,[Old],NewLI),
+  retract(weapon(player,Old)),
+  asserta(weapon(player,Item)),
+  retract(inInventory(player,LI)),
+  asserta(inInventory(player,NewLI)),
+  write('Anda kini menggunakan '), write(Item), write(' sebagai senjata anda'), nl.
+
+use(Item) :-
+  inInventory(player,LI),
+  member(Item, LI),
+  isAmmo(Item).
+
+use(Item) :-
+  inInventory(player,LI),
+  \+member(Item, LI),
+  write('Tidak bisa menggunakan barang tersebut'),nl, write('karena barang tersebut tidak ada dalam inventori'), nl.
+
 updatemapbaris(N) :-
     retract(map_element(_,_,N,1)), asserta(map_element('X','-',N,1)),
     retract(map_element(_,_,N,2)), asserta(map_element('X','-',N,2)),
@@ -316,6 +416,8 @@ do(tambahDeadZone) :- tambahDeadZone,!.
 do(countMove(A)) :- countMove(A),!.
 do(updatemapbaris(A)) :- updatemapbaris(A),!.
 do(updatemapkolom(A)) :- updatemapkolom(A),!.
+do(status) :- status,!.
+do(use(Item)) :- use(Item),!. 
 do(_) :- write('Perintah tidak valid!'),nl.
 
 gameoverZonaMati :-
