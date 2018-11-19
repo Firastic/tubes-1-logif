@@ -155,7 +155,7 @@ game_start:-
       close(In),
 
       retract(map_element(_,_,2,2)),
-      asserta(map_element('P','P',2,2)),
+      asserta(map_element('P',['P'],2,2)),
       initEnemy.
 
 
@@ -223,13 +223,13 @@ moveFromTo(A1,B1,A2,B2) :-
     asserta(position(A2,B2)),
     retract(countMove(C)),
     Cx is C+1,
-    asserta(countMove(Cx)).
+    asserta(countMove(Cx)),!.
 
 moveFromTo(A1,B1,A2,B2) :- 
     retract(position(A1,B1)),
     map_element(S, L, A1, B1),
-    retract(map_element(S,L,A1,B1)),
     delete(L,'P',LX),
+    retract(map_element(S,L,A1,B1)),
     asserta(map_element('-',LX,A1,B1)),
     asserta(position(A2,B2)),
     map_element(S1,L1,A2,B2),
@@ -254,6 +254,7 @@ look_pos(X,Y) :- map_element(_,_B,X,Y), member('W',[_B]), !, write('W').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member('A',[_B]), !, write('A').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member('O',[_B]), !, write('O').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member('P',[_B]), !, write('P').
+look_pos(X,Y) :- map_element(_,_B,X,Y), write('P').
 
 
 look_rek(_,_,C) :- C == 10, !.
