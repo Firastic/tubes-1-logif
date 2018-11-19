@@ -131,7 +131,6 @@ help :-
   write('   - = Petak yang bisa diakses                                             '),nl,
   write('   X = Zona mati. Jangan bergerak ke Zona ini!                             '),nl,nl.
 
-
 bacaFakta(end_of_file):- !.
 bacaFakta(X):- asserta(X),!,fail.
 
@@ -189,7 +188,9 @@ call_map(N) :- map1(N), N1 is N+1, call_map(N1).
 map :- call_map(1).
 
 initEnemy :-
-    isNPC(A),
+    forall(isNPC(A), initEnemy(A)).
+
+initEnemy(A) :-
     positionNPC(A, X, Y),
     retract(positionNPC(A, X, Y)),
     random(2, 11, NewX),
@@ -198,31 +199,56 @@ initEnemy :-
     map_element(S, L, NewX, NewY),
     retract(map_element(S, L, NewX, NewY)),
     append(L, [A], NewList),
-    write(NewList), nl,
-    asserta(map_element(S, NewList, NewX, NewY)),
-    write(NewList),
-    write(' di ('),
-    write(NewX),
-    write(', '),
-    write(NewY),
-    write(').'), nl.
+    asserta(map_element(S, NewList, NewX, NewY)).
 
 moveEnemy(A) :-
-    position(A, X, Y),
+    positionNPC(A, X, Y),
+    write(A), nl,
     retract(positionNPC(A, X, Y)),
+    write(X), write('spasi'), write(Y), nl,
     map_element(S, L, X, Y),
+    write(L), nl,
     retract(map_element(S, L, X, Y)),
+    delete(L, A, NL),
+    write(NL), nl,
+    asserta(map_element(S, NL, X, Y)),
     random(-1, 1, NewDX),
     random(-1, 1, NewDY),
     NewX is (X + NewDX),
     NewY is (Y + NewDY),
-    asserta(A, positionNPC(A, NewX, NewY)),
-    append(L, [A], NewList),
-    assert(map_element(S, NewList, X, Y)).
+    write(NewX), write('spasi'), write(NewY), nl,
+    normalizePosition(NewX, NewY, NNewX, NNewY),
+    write(NNewX), write('spasi'), write(NNewY), nl,
+    asserta(positionNPC(A, NNewX, NNewY)),
+    append(NL, [A], NewList),
+    write(NewList), nl,
+    asserta(map_element(S, NewList, X, Y)).
+
+normalizePosition(X, Y, XN, YN) :-
+    X < 1,
+    XN is 1,
+    normalizePosition(XN, Y, XN, YN).
+
+normalizePosition(X, Y, XN, YN) :-
+    Y < 1,
+    YN is 1,
+    normalizePosition(X, YN, XN, YN).
+
+normalizePosition(X, Y, XN, YN) :-
+    X > 12,
+    XN is 12,
+    normalizePosition(XN, Y, XN, YN).
+
+normalizePosition(X, Y, XN, YN) :-
+    Y > 12,
+    YN is 12,
+    normalizePosition(X, YN, XN, YN).
+
+normalizePosition(X, Y, XN, YN) :-
+    XN is X, YN is Y.
 
 moveAllEnemy :-
-    isNPC(A),
-    moveEnemy(A).
+    forall(isNPC(A), moveEnemy(A)).
 
 moveFromTo(A1,B1,A2,B2) :- 
     map_element('X',_,A2,B2),
@@ -367,32 +393,32 @@ use(Item) :-
   write('Tidak bisa menggunakan barang tersebut'),nl, write('karena barang tersebut tidak ada dalam inventori'), nl.
 
 updatemapbaris(N) :-
-    retract(map_element(_,_,N,1)), asserta(map_element('X','-',N,1)),
-    retract(map_element(_,_,N,2)), asserta(map_element('X','-',N,2)),
-    retract(map_element(_,_,N,3)), asserta(map_element('X','-',N,3)),
-    retract(map_element(_,_,N,4)), asserta(map_element('X','-',N,4)),
-    retract(map_element(_,_,N,5)), asserta(map_element('X','-',N,5)),
-    retract(map_element(_,_,N,6)), asserta(map_element('X','-',N,6)),
-    retract(map_element(_,_,N,7)), asserta(map_element('X','-',N,7)),
-    retract(map_element(_,_,N,8)), asserta(map_element('X','-',N,8)),
-    retract(map_element(_,_,N,9)), asserta(map_element('X','-',N,9)),
-    retract(map_element(_,_,N,10)), asserta(map_element('X','-',N,10)),
-    retract(map_element(_,_,N,11)), asserta(map_element('X','-',N,11)),
-    retract(map_element(_,_,N,12)), asserta(map_element('X','-',N,12)).
+    retract(map_element(_,X1,N,1)), asserta(map_element('X',X1,N,1)),
+    retract(map_element(_,X2,N,2)), asserta(map_element('X',X2,N,2)),
+    retract(map_element(_,X3,N,3)), asserta(map_element('X',X3,N,3)),
+    retract(map_element(_,X4,N,4)), asserta(map_element('X',X4,N,4)),
+    retract(map_element(_,X5,N,5)), asserta(map_element('X',X5,N,5)),
+    retract(map_element(_,X6,N,6)), asserta(map_element('X',X6,N,6)),
+    retract(map_element(_,X7,N,7)), asserta(map_element('X',X7,N,7)),
+    retract(map_element(_,X8,N,8)), asserta(map_element('X',X8,N,8)),
+    retract(map_element(_,X9,N,9)), asserta(map_element('X',X9,N,9)),
+    retract(map_element(_,X10,N,10)), asserta(map_element('X',X10,N,10)),
+    retract(map_element(_,X11,N,11)), asserta(map_element('X',X11,N,11)),
+    retract(map_element(_,X12,N,12)), asserta(map_element('X',X12,N,12)).
 
 updatemapkolom(N) :-
-  retract(map_element(_,_,1,N)), asserta(map_element('X','-',1,N)),
-  retract(map_element(_,_,2,N)), asserta(map_element('X','-',2,N)),
-  retract(map_element(_,_,3,N)), asserta(map_element('X','-',3,N)),
-  retract(map_element(_,_,4,N)), asserta(map_element('X','-',4,N)),
-  retract(map_element(_,_,5,N)), asserta(map_element('X','-',5,N)),
-  retract(map_element(_,_,6,N)), asserta(map_element('X','-',6,N)),
-  retract(map_element(_,_,7,N)), asserta(map_element('X','-',7,N)),
-  retract(map_element(_,_,8,N)), asserta(map_element('X','-',8,N)),
-  retract(map_element(_,_,9,N)), asserta(map_element('X','-',9,N)),
-  retract(map_element(_,_,10,N)), asserta(map_element('X','-',10,N)),
-  retract(map_element(_,_,11,N)), asserta(map_element('X','-',11,N)),
-  retract(map_element(_,_,12,N)), asserta(map_element('X','-',12,N)).
+  retract(map_element(_,X1,1,N)), asserta(map_element('X',X1,1,N)),
+  retract(map_element(_,X2,2,N)), asserta(map_element('X',X2,2,N)),
+  retract(map_element(_,X3,3,N)), asserta(map_element('X',X3,3,N)),
+  retract(map_element(_,X4,4,N)), asserta(map_element('X',X4,4,N)),
+  retract(map_element(_,X5,5,N)), asserta(map_element('X',X5,5,N)),
+  retract(map_element(_,X6,6,N)), asserta(map_element('X',X6,6,N)),
+  retract(map_element(_,X7,7,N)), asserta(map_element('X',X7,7,N)),
+  retract(map_element(_,X8,8,N)), asserta(map_element('X',X8,8,N)),
+  retract(map_element(_,X9,9,N)), asserta(map_element('X',X9,9,N)),
+  retract(map_element(_,X10,10,N)), asserta(map_element('X',X10,10,N)),
+  retract(map_element(_,X11,11,N)), asserta(map_element('X',X11,11,N)),
+  retract(map_element(_,X12,12,N)), asserta(map_element('X',X12,12,N)).
 
 tambahDeadZone :-
     countMove(A), A == 3,!,updatemapbaris(2).
@@ -414,10 +440,10 @@ tambahDeadZone.
 
 do(help):- help,!.
 do(map):-map,!.
-do(s) :- s,!.
-do(n) :- n,!.
-do(e) :- e,!.
-do(w) :- w,!.
+do(s) :- s, moveAllEnemy,!.
+do(n) :- n, moveAllEnemy,!.
+do(e) :- e, moveAllEnemy,!.
+do(w) :- w, moveAllEnemy,!.
 do(quit) :-quit,!.
 do(gameover) :-gameover,!.
 do(look) :- look,!.
