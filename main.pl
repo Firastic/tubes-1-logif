@@ -167,45 +167,19 @@ call_map(N) :- map1(N), N1 is N+1, call_map(N1).
 
 map :- call_map(1).
 
-s :- position(A,B), Ax is (A+1),
-     (map_element('X',_,Ax,B)),retract(position(A,B)),asserta(position(Ax,B)),
+moveFromTo(A1,B1,A2,B2) :- map_element('X',_,A2,B2), retract(position(A1,B1)),asserta(position(A2,B2)),
      retract(countMove(C)),Cx is C+1, asserta(countMove(Cx)).
 
-s :-  position(A,B), Ax is (A+1),
-       retract(position(A,B)),retract(map_element(_,_,A,B)), asserta(map_element('-','-',A,B)),
-       asserta(position(Ax,B)),
-       retract(map_element(_,_,Ax,B)),asserta(map_element('P','-',Ax,B)),
+moveFromTo(A1,B1,A2,B2) :- retract(position(A1,B1)),retract(map_element(_,_,A1,B1)), asserta(map_element('-','-',A1,B1)),
+       asserta(position(A2,B2)),
+       retract(map_element(_,_,A2,B2)),asserta(map_element('P','-',A2,B2)),
        retract(countMove(C)),Cx is C+1, asserta(countMove(Cx)), tambahDeadZone.
 
-n :- position(A,B), Ax is (A-1),
-     (map_element('X',_,Ax,B)),retract(position(A,B)),asserta(position(Ax,B)),
-     retract(countMove(C)),Cx is C+1, asserta(countMove(Cx)).
 
-n :- position(A,B), Ax is (A-1),
-     retract(position(A,B)),retract(map_element(_,_,A,B)), asserta(map_element('-','-',A,B)),
-     asserta(position(Ax,B)),
-     retract(map_element(_,_,Ax,B)),asserta(map_element('P','-',Ax,B)),
-     retract(countMove(C)),Cx is C+1, asserta(countMove(Cx)),tambahDeadZone.
-
-e :- position(A,B), Bx is (B+1),
-     (map_element('X',_,A,Bx)),retract(position(A,B)),asserta(position(A,Bx)),
-     retract(countMove(C)),Cx is C+1, asserta(countMove(Cx)).
-
-e :-  position(A,B), Bx is (B+1),
-      retract(position(A,B)),retract(map_element(_,_,A,B)), asserta(map_element('-','-',A,B)),
-      asserta(position(A,Bx)),
-      retract(map_element(_,_,A,Bx)),asserta(map_element('P','-',A,Bx)),
-      retract(countMove(C)),Cx is C+1, asserta(countMove(Cx)),tambahDeadZone.
-
-w :- position(A,B), Bx is (B-1),
-      (map_element('X',_,A,Bx)),retract(position(A,B)),asserta(position(A,Bx)),
-      retract(countMove(C)),Cx is C+1, asserta(countMove(Cx)).
-
-w :-  position(A,B), Bx is (B-1),
-      retract(position(A,B)),retract(map_element(_,_,A,B)), asserta(map_element('-','-',A,B)),
-      asserta(position(A,Bx)),
-      retract(map_element(_,_,A,Bx)),asserta(map_element('P','-',A,Bx)),
-      retract(countMove(C)),Cx is C+1, asserta(countMove(Cx)),tambahDeadZone.
+s :- position(A,B), Ax is (A+1), moveFromTo(A,B,Ax,B).
+n :- position(A,B), Ax is (A-1), moveFromTo(A,B,Ax,B).
+e :- position(A,B), Bx is (B+1), moveFromTo(A,B,A,Bx).
+w :- position(A,B), Bx is (B-1), moveFromTo(A,B,A,Bx).
 
 look_pos(X,Y) :- map_element(A,B,X,Y), A == 'X' -> write(A).
 look_pos(X,Y) :- map_element(A,B,X,Y) -> write(B).
