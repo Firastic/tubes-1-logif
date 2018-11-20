@@ -231,6 +231,7 @@ moveEnemyHelper(X, Y, NewX, NewY) :-
     isEnemyHere(X, Y + 1),
     isEnemyHere(X + 1, Y),
     isEnemyHere(X + 1, Y + 1),
+    !,
     NewX is X, NewY is Y.
 
 moveEnemyHelper(X, Y, NewX, NewY) :-
@@ -238,6 +239,7 @@ moveEnemyHelper(X, Y, NewX, NewY) :-
     isEnemyHere(X, Y - 1),
     isEnemyHere(X + 1, Y),
     isEnemyHere(X + 1, Y - 1),
+    !,
     NewX is X, NewY is Y.
 
 moveEnemyHelper(X, Y, NewX, NewY) :-
@@ -245,26 +247,29 @@ moveEnemyHelper(X, Y, NewX, NewY) :-
     isEnemyHere(X, Y + 1),
     isEnemyHere(X - 1, Y),
     isEnemyHere(X - 1, Y + 1),
+    !,
     NewX is X, NewY is Y.
 
 moveEnemyHelper(X, Y, NewX, NewY) :-
     X = 12, Y = 12,
+    !,
     isEnemyHere(X, Y - 1),
     isEnemyHere(X - 1, Y),
     isEnemyHere(X - 1, Y - 1),
     NewX is X, NewY is Y.
 
 moveEnemyHelper(X, Y, NewX, NewY) :-
-    random(-1, 1, NewDX),
-    random(-1, 1, NewDY),
+    random(-1, 2, NewDX),
+    random(-1, 2, NewDY),
     NX is X + NewDX, NY is Y + NewDY,
     normalizePosition(NX, NY, NNewX, NNewY),
     \+isEnemyHere(NNewX, NNewY),
+    !,
     NewX is NNewX, NewY is NNewY.
 
 moveEnemyHelper(X, Y, NewX, NewY) :-
-    random(-1, 1, NewDX),
-    random(-1, 1, NewDY),
+    random(-1, 2, NewDX),
+    random(-1, 2, NewDY),
     NX is X + NewDX, NY is Y + NewDY,
     normalizePosition(NX, NY, NNewX, NNewY),
     isEnemyHere(NNewX, NNewY),
@@ -288,21 +293,25 @@ isEnemyHere(X, Y) :-
 
 normalizePosition(X, Y, XN, YN) :-
     X < 1,
+    !,
     XN is 1,
     normalizePosition(XN, Y, XN, YN).
 
 normalizePosition(X, Y, XN, YN) :-
     Y < 1,
+    !,
     YN is 1,
     normalizePosition(X, YN, XN, YN).
 
 normalizePosition(X, Y, XN, YN) :-
     X > 12,
+    !,
     XN is 12,
     normalizePosition(XN, Y, XN, YN).
 
 normalizePosition(X, Y, XN, YN) :-
     Y > 12,
+    !,
     YN is 12,
     normalizePosition(X, YN, XN, YN).
 
