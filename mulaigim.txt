@@ -153,6 +153,6 @@ inInventory(tentaraBelanda, [senapan]).
 inInventory(tentaraJepang, [sumpit]).
 inInventory(antekPKI, [kujang]).
 inInventory(koruptor, [duit]).
-health(player,70).
-armor(player,70).
-weapon(player,none).
+health(player,100).
+armor(player,0).
+weapon(player,none, 0).

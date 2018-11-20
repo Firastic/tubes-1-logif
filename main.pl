@@ -6,11 +6,13 @@
 :-dynamic(positionNPC/3).
 :-dynamic(armor/2).
 :-dynamic(health/2).
-:-dynamic(weapon/2).
+:-dynamic(weapon/3).
 :-dynamic(inInventory/2).
 
+/*
 armor(player,0).
-weapon(player, none).
+weapon(player, senapan, 2).
+*/
 
 isWeapon(keris).
 isWeapon(kujang).
@@ -34,8 +36,9 @@ isNPC(tentaraBelanda).
 isNPC(tentaraJepang).
 isNPC(antekPKI).
 isNPC(koruptor).
-
+/*
 health(player,100).
+*/
 health(tentaraBelanda, 100).
 health(tentaraJepang, 100).
 health(antekPKI, 100).
@@ -50,6 +53,11 @@ damage(duit, 30).
 
 isAmmo(peluru).
 isAmmo(anaksumpit).
+
+/*
+ammo(peluru, 10).
+ammo(anaksumpit,10).
+*/
 
 weaponAmmo(keris, none).
 weaponAmmo(kujang, none).
@@ -414,10 +422,11 @@ status :-
     inInventory(player,LI),
     health(player,H),
     armor(player,A),
-    weapon(player,W),
+    weapon(player,W,X),
     write('Health : '), write(H), nl,
     write('Armor  : '), write(A), nl,
     write('Weapon : '), write(W), nl,
+    write('Ammo   : '), write(X), nl, 
     write('Isi Inventori : '),nl, tulisInventory(LI).
 
 tulisInventory([])     :- write(' -Kosong-'), nl, !.
@@ -450,6 +459,7 @@ take(Item) :-
     \+member(Item, L), !,
     write('Tidak ada '), write(Item), write(' di sini! Miskin!'), nl.
 
+/*ARMOR ITEM*/
 use(Item) :-
   inInventory(player,LI),
   member(Item, LI),
@@ -464,6 +474,7 @@ use(Item) :-
   asserta(inInventory(player,NewLI)),
   write('Armor anda bertambah sebesar '), write(ArmorAdded), nl.
 
+/*MEDICINE ITEM*/
 use(Item) :-
   inInventory(player,LI),
   member(Item, LI),
@@ -493,48 +504,82 @@ use(Item) :-
   asserta(inInventory(player,NewLI)),
   write('Health anda bertambah sebesar '), write(HealthAdded), nl.
 
+/*WEAPON ITEM*/
 use(Item) :-
   inInventory(player,LI),
   member(Item, LI),
   isWeapon(Item),
-  weapon(player,Old),
+  weapon(player,Old,_),
   delete(LI,Item,NewLI),
   Old == none,!,
-  retract(weapon(player,Old)),
-  asserta(weapon(player,Item)),
+  retract(weapon(player,Old,_)),
+  asserta(weapon(player,Item,0)),
   retract(inInventory(player,LI)),
   asserta(inInventory(player,NewLI)),
-  write('Anda kini menggunakan '), write(Item), write(' sebagai senjata anda'), nl.
+  write('Kamu kini menggunakan '), write(Item), write(' sebagai senjata kamu'), nl,
+  write('Ups, tapi ingat, pelurunya masih kosong lo ya'), nl.
 
+/*Kasus Ammo Habis atau Weapon tanpa Ammo*/
 use(Item) :-
   inInventory(player,LI),
   member(Item, LI),
   isWeapon(Item),
-  weapon(player,Old),
+  weapon(player,Old,0),
   delete(LI,Item,TempLI),
   append(TempLI,[Old],NewLI),
-  retract(weapon(player,Old)),
-  asserta(weapon(player,Item)),
+  retract(weapon(player,Old, 0)),
+  asserta(weapon(player,Item, 0)),
   retract(inInventory(player,LI)),
   asserta(inInventory(player,NewLI)),
-  write('Anda kini menggunakan '), write(Item), write(' sebagai senjata anda'), nl.
+  write('Kamu kini menggunakan '), write(Item), write(' sebagai senjatamu'), nl.
 
+/*Kasus Weapon yang masih punya ammo sejumlah TotalAmmo*/
+use(Item) :-
+  inInventory(player,LI),
+  member(Item, LI),
+  isWeapon(Item),
+  weapon(player,Old,TotalAmmo),
+  weaponAmmo(Old,Ammo),
+  delete(LI,Item,TempLI),
+  append(TempLI,[Old],NNLI),
+  appendNElmt(Ammo, TotalAmmo, NNLI, NewLI),
+  retract(weapon(player,Old, TotalAmmo)),
+  asserta(weapon(player,Item, 0)),
+  retract(inInventory(player,LI)),
+  asserta(inInventory(player,NewLI)),
+  write('kamu kini menggunakan '), write(Item), write(' sebagai senjatamu'), nl,
+  write('Senjata lamamu beserta ammonya kini disimpan dalam inventorimu'), nl.
+
+/*AMMO ITEM*/
 use(Item) :-
   inInventory(player,LI),
   member(Item, LI),
   isAmmo(Item),
   weaponAmmo(Weapon,Item),
-  weapon(player, HandWeapon),
+  weapon(player, HandWeapon, AmmoNow),
   HandWeapon == Weapon,
-  delete(LI,Item,NewLI),
+  NewAmmo is AmmoNow +1,
+  deleteOne(LI,Item,NewLI),
+  retract(weapon(player,HandWeapon, AmmoNow)),
+  asserta(weapon(player,HandWeapon, NewAmmo)),
   retract(inInventory(player,LI)),
   asserta(inInventory(player,NewLI)),
-  write('Anda mengisi kembali'), write(Weapon), write(' dengan ammo'),nl.
+  write('kamu mengisi kembali'), write(Weapon), write(' dengan 1 buah ammo'),nl.
 
 use(Item) :-
   inInventory(player,LI),
   \+member(Item, LI),
   write('Tidak bisa menggunakan barang tersebut'),nl, write('karena barang tersebut tidak ada dalam inventori'), nl.
+
+deleteOne([], _ , []).
+deleteOne([Item|Tail],Item, Tail) :- !.
+deleteOne([Head|Tail],Item, [Head|Result]) :-
+  deleteOne(Tail,Item, Result).
+
+appendNElmt(_,0,List,Result) :- Result = List, !.
+appendNElmt(X,Count,List,Result) :- Count == 1, append(List,[X],Result),!.
+appendNElmt(X,Count,List,Result) :- CountTemp is Count - 1, append(List,[X],NewLi), appendNElmt(X,CountTemp,NewLi,Result).
+
 
 drop(Item) :-
   inInventory(player,LI),
