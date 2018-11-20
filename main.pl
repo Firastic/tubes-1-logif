@@ -272,19 +272,19 @@ moveEnemyHelper(X, Y, NewX, NewY) :-
 
 isEnemyHere(X, Y) :-
     map_element(_, L, X, Y),
-    member(tentaraBelanda, L).
+    member(tentaraBelanda, L),!.
 
 isEnemyHere(X, Y) :-
     map_element(_, L, X, Y),
-    member(tentaraJepang, L).
+    member(tentaraJepang, L),!.
 
 isEnemyHere(X, Y) :-
     map_element(_, L, X, Y),
-    member(antekPKI, L).
+    member(antekPKI, L),!.
 
 isEnemyHere(X, Y) :-
     map_element(_, L, X, Y),
-    member(koruptor, L).
+    member(koruptor, L),!.
 
 normalizePosition(X, Y, XN, YN) :-
     X < 1,
