@@ -220,7 +220,6 @@ moveEnemy(A) :-
     moveEnemyHelper(X, Y, NNewX, NNewY),
     print(NNewX), print('spasi'), print(NNewY), nl,
     map_element(NextS, NextL, NNewX, NNewY),
-    write(NNewX,NNewY),nl,
     retract(map_element(NextS, NextL, NNewX, NNewY)),
     asserta(positionNPC(A, NNewX, NNewY)),
     append(NextL, [A], NewList),
