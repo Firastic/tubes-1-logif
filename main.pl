@@ -8,6 +8,7 @@
 :-dynamic(health/2).
 :-dynamic(weapon/3).
 :-dynamic(inInventory/2).
+:-dynamic(isNPC/1).
 
 /*
 armor(player,0).
@@ -191,6 +192,8 @@ map1(N):-
   (map_element(J,_,N,10) -> write(J)),
   (map_element(K,_,N,11) -> write(K)),
   (map_element(L,_,N,12) -> write(L)),nl.
+
+
 
 call_map(N) :- N == 13, !.
 call_map(N) :- map1(N), N1 is N+1, call_map(N1).
@@ -376,6 +379,8 @@ look_pos(X,Y) :- map_element(_,_B,X,Y), member(panadol,_B), !, write('O').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member(obhCombi,_B), !, write('O').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member(minyakKayuPutih,_B), !, write('O').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member(jamu,_B), !, write('O').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(peluru,_B), !, write('T').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(anaksumpit,_B), !, write('T').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member('P',_B), !, write('P').
 look_pos(X,Y) :- map_element(_,_B,X,Y), write('P').
 
@@ -404,6 +409,8 @@ look_desc(X,Y) :- map_element(_,_B,X,Y), member(panadol,_B), write('Terdapat pan
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(obhCombi,_B), write('Terdapat OBH Combi disini. ').
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(minyakKayuPutih,_B), write('Terdapat minyak kayu putih disini. ').
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(jamu,_B), write('Terdapat jamu disini. ').
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(peluru,_B), write('Terdapat peluru disini.').
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(anaksumpit,_B),write('Terdapat anaksumpit disini.').
 look_desc(_,_) :- nl.
 
 look :- position(A,B),
@@ -411,7 +418,25 @@ look :- position(A,B),
         B1 is B-1,
         look_rek(A1,B1,1),
         look_desc(A,B).
-        
+
+cheathelper(N):-
+      look_pos(N,1),
+      look_pos(N,2),
+      look_pos(N,3),
+      look_pos(N,4),
+      look_pos(N,5),
+      look_pos(N,6),
+      look_pos(N,7),
+      look_pos(N,8),
+      look_pos(N,9),
+      look_pos(N,10),
+      look_pos(N,11),
+      look_pos(N,12),nl.
+
+cheat :-
+    cheathelper(1),cheathelper(2),cheathelper(3),cheathelper(4),cheathelper(5),cheathelper(6),cheathelper(7),
+    cheathelper(8),cheathelper(9),cheathelper(10),cheathelper(11),cheathelper(12).
+
 status :-
     inInventory(player,LI),
     health(player,H),
@@ -420,7 +445,7 @@ status :-
     write('Health : '), write(H), nl,
     write('Armor  : '), write(A), nl,
     write('Weapon : '), write(W), nl,
-    write('Ammo   : '), write(X), nl, 
+    write('Ammo   : '), write(X), nl,
     write('Isi Inventori : '),nl, tulisInventory(LI).
 
 tulisInventory([])     :- write(' -Kosong-'), nl, !.
@@ -588,8 +613,8 @@ drop(Item) :-
   asserta(inInventory(player,NewLI)),
   position(A,B),
   retract(map_element(_,LPetak,A,B)),
-  append(LPetak,['W'],NewLPetak),
-  assert(map_element(_,NewLPetak,A,B)).
+  append(LPetak,[Item],NewLPetak),
+  asserta(map_element(_,NewLPetak,A,B)).
 
 drop(Item) :-
   inInventory(player,LI),
@@ -599,8 +624,8 @@ drop(Item) :-
   asserta(inInventory(player,NewLI)),
   position(A,B),
   retract(map_element(_,LPetak,A,B)),
-  append(LPetak,['M'],NewLPetak),
-  assert(map_element(_,NewLPetak,A,B)).
+  append(LPetak,[Item],NewLPetak),
+  asserta(map_element(_,NewLPetak,A,B)).
 
 drop(Item) :-
   inInventory(player,LI),
@@ -610,8 +635,8 @@ drop(Item) :-
   asserta(inInventory(player,NewLI)),
   position(A,B),
   retract(map_element(_,LPetak,A,B)),
-  append(LPetak,['A'],NewLPetak),
-  assert(map_element(_,NewLPetak,A,B)).
+  append(LPetak,[Item],NewLPetak),
+  asserta(map_element(_,NewLPetak,A,B)).
 
 drop(Item) :-
   inInventory(player,LI),
@@ -621,8 +646,8 @@ drop(Item) :-
   asserta(inInventory(player,NewLI)),
   position(A,B),
   retract(map_element(_,LPetak,A,B)),
-  append(LPetak,['A'],NewLPetak),
-  assert(map_element(_,NewLPetak,A,B)).
+  append(LPetak,[Item],NewLPetak),
+  asserta(map_element(_,NewLPetak,A,B)).
 
 checkEnemy :-
     position(X, Y),
@@ -743,11 +768,13 @@ attackHelper3 :-
     write(NPC), write(' telah kamu bunuh! Dia menjatuhkan hal berikut!'), nl,
     inInventory(NPC, INVENTORY_LIST),
     write(INVENTORY_LIST),
-    drop(NPC).
+    dropNPC(NPC),
+    retract(map_element(S, L, X, Y)),
+    delete(L,NPC,NL),
+    asserta(map_element(S, NL, X, Y)).
 
 dropNPC(NPC) :-
-    inInventory(NPC, INVENTORY_LIST),
-    retract(NPC, INVENTORY_LIST),
+    retract(inInventory(NPC, INVENTORY_LIST)),
     positionNPC(NPC, X, Y),
     map_element(S, L, X, Y),
     retract(map_element(S, L, X, Y)),
@@ -760,7 +787,7 @@ checkPlayerLife :-
     write('Kamu mati! Permainan selesai!'), nl.
 
 dropMedicine :-
-    random(1, 4, RanNum),
+    random(1, 5, RanNum),
     dropMedicineHelper(RanNum).
 
 dropMedicineHelper(RanNum) :-
@@ -808,7 +835,7 @@ dropMedicineHelper(RanNum) :-
     asserta(map_element(S, NewL, RanX, RanY)).
 
 dropArmor :-
-    random(1, 5, RanNum),
+    random(1, 6, RanNum),
     dropArmorHelper(RanNum).
 
 dropArmorHelper(RanNum) :-
@@ -867,7 +894,7 @@ dropArmorHelper(RanNum) :-
     asserta(map_element(S, NewL, RanX, RanY)).
 
 dropWeapon :-
-    random(1, 6, RanNum),
+    random(1, 7, RanNum),
     dropWeaponHelper(RanNum).
 
 dropWeaponHelper(RanNum) :-
@@ -936,13 +963,39 @@ dropWeaponHelper(RanNum) :-
     write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
     asserta(map_element(S, NewL, RanX, RanY)).
 
-dropRandomizer :-
+dropAmmo :-
     random(1, 3, RanNum),
+    dropAmmoHelper(RanNum).
+
+dropAmmoHelper(RanNum) :-
+    RanNum = 1,
+    random(1, 12, RX),
+    random(1, 12, RY),
+    goodRandomizer(RX, RY, RanX, RanY),
+    map_element(S, L, RanX, RanY),
+    retract(map_element(S, L, RanX, RanY)),
+    append(L, [peluru], NewL),
+    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
+    asserta(map_element(S, NewL, RanX, RanY)).
+
+dropAmmoHelper(RanNum) :-
+    RanNum = 2,
+    random(1, 12, RX),
+    random(1, 12, RY),
+    goodRandomizer(RX, RY, RanX, RanY),
+    map_element(S, L, RanX, RanY),
+    retract(map_element(S, L, RanX, RanY)),
+    append(L, [anaksumpit], NewL),
+    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
+    asserta(map_element(S, NewL, RanX, RanY)).
+
+dropRandomizer :-
+    random(1, 6, RanNum),
     dropRandomizerHelper(RanNum).
 
 dropRandomizerHelper(RanNum) :-
     RanNum = 1,
-    dropArmor.
+    dropMedicine.
 
 dropRandomizerHelper(RanNum) :-
     RanNum = 2,
@@ -950,7 +1003,15 @@ dropRandomizerHelper(RanNum) :-
 
 dropRandomizerHelper(RanNum) :-
     RanNum = 3,
+    dropWeapon.
+
+dropRandomizerHelper(RanNum) :-
+    RanNum = 4,
     dropMedicine.
+
+dropRandomizerHelper(RanNum) :-
+    RanNum = 5,
+    dropWeapon.
 
 goodRandomizer(X, Y, XN, YN) :-
     map_element(S, _, X, Y),
@@ -993,21 +1054,21 @@ updatemapkolom(N) :-
   retract(map_element(_,X12,12,N)), asserta(map_element('X',X12,12,N)).
 
 tambahDeadZone :-
-    countMove(A), A == 3,!,updatemapbaris(2).
+    countMove(A), A == 5,!,updatemapbaris(1).
 tambahDeadZone :-
-    countMove(A), A == 6,!,updatemapbaris(3).
+    countMove(A), A == 10,!,updatemapbaris(1).
 tambahDeadZone :-
-    countMove(A), A == 9,!,updatemapkolom(2).
+    countMove(A), A == 15,!,updatemapkolom(1).
 tambahDeadZone :-
-    countMove(A), A == 12,!,updatemapbaris(4),updatemapkolom(3).
+    countMove(A), A == 20,!,updatemapkolom(1).
 tambahDeadZone :-
-    countMove(A), A == 15,!,updatemapbaris(5),updatemapkolom(4).
+    countMove(A), A == 25,!,updatemapbaris(1),updatemapkolom(1).
 tambahDeadZone :-
-    countMove(A), A == 19,!,updatemapbaris(6),updatemapbaris(7),updatemapkolom(5).
+    countMove(A), A == 30,!,updatemapbaris(1),updatemapkolom(1).
 tambahDeadZone :-
-    countMove(A), A == 23,!,updatemapbaris(8),updatemapkolom(6),updatemapkolom(7),updatemapkolom(8).
+    countMove(A), A == 35,!,updatemapbaris(1),updatemapkolom(1).
 tambahDeadZone :-
-    countMove(A), A == 27,!,updatemapbaris(9),updatemapkolom(9),updatemapkolom(10),updatemapbaris(10).
+    countMove(A), A == 40,!,updatemapbaris(1),updatemapkolom(1).
 tambahDeadZone.
 
 do(help):- help,!.
@@ -1019,7 +1080,7 @@ do(w) :- w, moveAllEnemy, dropRandomizer, !.
 do(quit) :-quit,!.
 do(gameover) :-gameover,!.
 do(look) :- look,!.
-do(drop) :- drop,!.
+do(drop(A)) :- drop(A),!.
 do(tambahDeadZone) :- tambahDeadZone,!.
 do(countMove(A)) :- countMove(A),!.
 do(updatemapbaris(A)) :- updatemapbaris(A),!.
@@ -1029,6 +1090,7 @@ do(use(Item)) :- use(Item),!.
 do(take(Item)) :- take(Item),!.
 do(attack) :- attack,!.
 do(_) :- write('Perintah tidak valid!'),nl.
+do(cheat) :- cheat.
 
 gameoverZonaMati :-
     position(A,B),
