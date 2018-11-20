@@ -409,7 +409,7 @@ look_desc(X,Y) :- map_element(_,_B,X,Y), member(panadol,_B), write('Terdapat pan
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(obhCombi,_B), write('Terdapat OBH Combi disini. ').
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(minyakKayuPutih,_B), write('Terdapat minyak kayu putih disini. ').
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(jamu,_B), write('Terdapat jamu disini. ').
-look_desc(X,Y) :- nl.
+look_desc(_,_) :- nl.
 
 look :- position(A,B),
         A1 is A-1,
@@ -652,24 +652,24 @@ checkEnemy :-
 
 attack :-
     position(X, Y),
-    map_element(S, L, X, Y),
+    map_element(_, _, X, Y),
     checkEnemy,
     attackHelper1,
     write('ATTACK SEQUENCE 1'), nl.
 
 attack :-
     position(X, Y),
-    map_element(S, L, X, Y),
+    map_element(_, _, X, Y),
     \+checkEnemy,
     write('Tidak ada musuh disini!'), nl.
 
 attackHelper1 :-
-    weapon(player, WEAPON_PLAYER),
+    weapon(player, WEAPON_PLAYER,_),
     \+WEAPON_PLAYER = none,
     attackHelper2(WEAPON_PLAYER).
 
 attackHelper1 :-
-    weapon(player, WEAPON_PLAYER),
+    weapon(player, WEAPON_PLAYER,_),
     WEAPON_PLAYER = none,
     write('Kamu tidak memegang senjata! Cari mati kamu?'), nl.
 
@@ -683,18 +683,24 @@ attackHelper2(WEAPON_PLAYER) :-
     retract(health(NPC, CURRENT_HEALTH)),
     damage(WEAPON_PLAYER, DAMAGE_PLAYER),
     NEW_HEALTH is CURRENT_HEALTH - DAMAGE_PLAYER,
-    asserta(health(NPC, CURRENT_HEALTH)),
+    asserta(health(NPC, NEW_HEALTH)),
     write('Nyawa '), write(NPC), write(' berkurang '), write(DAMAGE_PLAYER), write('!'), nl,
     attackHelper3.
 
 attackHelper2(WEAPON_PLAYER) :-
     weaponAmmo(WEAPON_PLAYER, AMMO_TYPE),
+    weapon(player,WEAPON_PLAYER,AMMO_AMMOUNT),
     \+AMMO_TYPE = none,
+    /*
     inInventory(player, INVENTORY_LIST),
     member(AMMO_TYPE, INVENTORY_LIST),
     retract(inInventory(player, INVENTORY_LIST)),
     delete(INVENTORY_LIST, AMMO_TYPE, INVENTORY_LIST_NEW),
     asserta(inInventory(player, INVENTORY_LIST_NEW)),
+    */
+    NEW_AMMO is AMMO_AMMOUNT -1,
+    retract(weapon(player,WEAPON_PLAYER,AMMO_AMMOUNT)),
+    asserta(weapon(player,WEAPON_PLAYER,NEW_AMMO)),
     write(AMMO_TYPE), write(' berkurang 1!'), nl,
     position(X, Y),
     positionNPC(NPC, X, Y),
@@ -703,24 +709,32 @@ attackHelper2(WEAPON_PLAYER) :-
     retract(health(NPC, CURRENT_HEALTH)),
     damage(WEAPON_PLAYER, DAMAGE_PLAYER),
     NEW_HEALTH is CURRENT_HEALTH - DAMAGE_PLAYER,
-    asserta(health(NPC, CURRENT_HEALTH)),
+    asserta(health(NPC, NEW_HEALTH)),
     write('Nyawa '), write(NPC), write(' berkurang '), write(DAMAGE_PLAYER), write('!'), nl,
     attackHelper3.
 
 attackHelper2(WEAPON_PLAYER) :-
     weaponAmmo(WEAPON_PLAYER, AMMO_TYPE),
+    weapon(player,WEAPON_PLAYER,AMMO_AMMOUNT),
     \+AMMO_TYPE = none,
-    inInventory(player, INVENTORY_LIST),
-    \+member(AMMO_TYPE, INVENTORY_LIST),
-    write('Kamu tidak memiliki '), write(AMMO_TYPE), write('! Rasain!'),
-    attackHelper3.
+    AMMO_AMMOUNT == 0,
+    inInventory(player,INVENTORY_LIST),
+    member(AMMO_TYPE,INVENTORY_LIST),
+    write('Ammo kamu sedang kosong reload dulu mz'),nl.
+
+attackHelper2(WEAPON_PLAYER) :-
+    weaponAmmo(WEAPON_PLAYER, AMMO_TYPE),
+    weapon(player,WEAPON_PLAYER,AMMO_AMMOUNT),
+    \+AMMO_TYPE = none,
+    AMMO_AMMOUNT == 0,
+    write('Ammo kamu sedang kosong, dan di inventori mu tidak tersedia'), write(AMMO_TYPE),nl.
 
 attackHelper3 :-
     position(X, Y),
     positionNPC(NPC, X, Y),
     health(NPC, HEALTH_NPC),
     HEALTH_NPC > 0,
-    inInventory(NPC, [WEAPON_NPC|TAIL]),
+    inInventory(NPC, [WEAPON_NPC|_]),
     damage(WEAPON_NPC, DAMAGE_NPC),
     write(NPC), write(' menyerang kamu! Nyawa kamu berkurang '), write(DAMAGE_NPC), write('!'), nl,
     retract(health(player, CURRENT_HEALTH)),
