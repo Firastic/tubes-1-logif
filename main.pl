@@ -260,10 +260,10 @@ moveEnemyHelper(X, Y, NewX, NewY) :-
 
 moveEnemyHelper(X, Y, NewX, NewY) :-
     X = 12, Y = 12,
-    !,
     isEnemyHere(X, Y - 1),
     isEnemyHere(X - 1, Y),
     isEnemyHere(X - 1, Y - 1),
+    !,
     NewX is X, NewY is Y.
 
 moveEnemyHelper(X, Y, NewX, NewY) :-
@@ -276,13 +276,8 @@ moveEnemyHelper(X, Y, NewX, NewY) :-
     NewX is NNewX, NewY is NNewY.
 
 moveEnemyHelper(X, Y, NewX, NewY) :-
-    random(-1, 2, NewDX),
-    random(-1, 2, NewDY),
-    NX is X + NewDX, NY is Y + NewDY,
-    normalizePosition(NX, NY, NNewX, NNewY),
-    isEnemyHere(NNewX, NNewY),
-    moveEnemyHelper(X, Y, NNNewX, NNNewY),
-    NewX is NNNewX, NewY is NNNewY.
+    moveEnemyHelper(X, Y, NNewX, NNewY),
+    NewX is NNewX, NewY is NNewY.
 
 isEnemyHere(X, Y) :-
     map_element(_, L, X, Y),
