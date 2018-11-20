@@ -198,6 +198,7 @@ initEnemy(A) :-
     retract(positionNPC(A, X, Y)),
     random(2, 11, NewX),
     random(2, 11, NewY),
+    write('initposition'), write(NewX), write(NewY),nl,
     asserta(positionNPC(A, NewX, NewY)),
     map_element(S, L, NewX, NewY),
     retract(map_element(S, L, NewX, NewY)),
@@ -215,12 +216,16 @@ moveEnemy(A) :-
     delete(L, A, NL),
     write(NL), nl,
     asserta(map_element(S, NL, X, Y)),
+
     moveEnemyHelper(X, Y, NNewX, NNewY),
     print(NNewX), print('spasi'), print(NNewY), nl,
+    map_element(NextS, NextL, NNewX, NNewY),
+    write(NNewX,NNewY),nl,
+    retract(map_element(NextS, NextL, NNewX, NNewY)),
     asserta(positionNPC(A, NNewX, NNewY)),
-    append(NL, [A], NewList),
+    append(NextL, [A], NewList),
     write(NewList), nl,
-    asserta(map_element(S, NewList, X, Y)).
+    asserta(map_element(NextS, NewList, NNewX, NNewY)).
 
 moveEnemyHelper(X, Y, NewX, NewY) :-
     X = 1, Y = 1,
@@ -367,10 +372,34 @@ look_rek(A,B,C) :-  0 is mod(C,3), !, look_pos(A,B), nl,
                     A1 is A+1, B1 is B-2, C1 is C+1, look_rek(A1,B1,C1).
 look_rek(A,B,C) :- look_pos(A,B), B1 is B+1, C1 is C+1, look_rek(A,B1,C1).
 
+look_desc(X,Y) :- map_element(_,_B,X,Y), _B == ['P'], !, write('Kamu sedang berada di lapangan terbuka, tidak ada apa-apa disini'),nl.
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(tentaraBelanda,_B), write('Terdapat tentara belanda disini. ').
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(tentaraJepang,_B), write('Terdapat tentara jepang disini. ').
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(antekPKI,_B), write('Terdapat antek PKI disini. ').
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(koruptor,_B), write('Terdapat koruptor disini. ').
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(keris,_B), write('Terdapat keris disini. ').
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(kujang,_B), write('Terdapat kujang disini. ').
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(bambuRuncing,_B), write('Terdapat bambu runcing disini. ').
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(senapan,_B), write('Terdapat senapan disini. ').
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(sumpit,_B), write('Terdapat sumpit disini. ').
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(duit,_B), write('Terdapat duit disini. ').
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(tameng,_B), write('Terdapat tameng disini. ').
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(zirah,_B), write('Terdapat zirah disini. ').
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(helm,_B), write('Terdapat helm disini. ').
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(jimat,_B), write('Terdapat jimat disini. ').
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(batuAkik,_B), write('Terdapat batu akik disini. ').
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(panadol,_B), write('Terdapat panadol disini. ').
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(obhCombi,_B), write('Terdapat OBH Combi disini. ').
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(minyakKayuPutih,_B), write('Terdapat minyak kayu putih disini. ').
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(jamu,_B), write('Terdapat jamu disini. ').
+look_desc(X,Y) :- nl.
+
 look :- position(A,B),
         A1 is A-1,
         B1 is B-1,
-        look_rek(A1,B1,1).
+        look_rek(A1,B1,1),
+        look_desc(A,B).
+        
 
 status :-
     inInventory(player,LI),
