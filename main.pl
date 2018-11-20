@@ -359,7 +359,14 @@ use(Item) :-
 use(Item) :-
   inInventory(player,LI),
   member(Item, LI),
-  isAmmo(Item).
+  isAmmo(Item),
+  weaponAmmo(Weapon,Item),
+  weapon(player, HandWeapon),
+  HandWeapon == Weapon,
+  delete(LI,Item,NewLI),
+  retract(inInventory(player,LI)),
+  asserta(inInventory(player,NewLI)),
+  write('Anda mengisi kembali'), write(Weapon), write(' dengan ammo'),nl.
 
 use(Item) :-
   inInventory(player,LI),
