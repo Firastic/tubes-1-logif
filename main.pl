@@ -273,7 +273,8 @@ moveEnemyHelper(X, Y, NewX, NewY) :-
     NX is X + NewDX, NY is Y + NewDY,
     normalizePosition(NX, NY, NNewX, NNewY),
     isEnemyHere(NNewX, NNewY),
-    moveEnemyHelper(X, Y, NewX, NewY).
+    moveEnemyHelper(X, Y, NNNewX, NNNewY),
+    NewX is NNNewX, NewY is NNNewY.
 
 isEnemyHere(X, Y) :-
     map_element(_, L, X, Y),
