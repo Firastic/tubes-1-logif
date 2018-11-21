@@ -229,7 +229,7 @@ moveEnemy(A) :-
     write(NL), nl,
     asserta(map_element(S, NL, X, Y)),
 
-    moveEnemyHelper(X, Y, NNewX, NNewY),
+    moveEnemyHelper(X, Y, NNewX, NNewY, 1),
     print(NNewX), print('spasi'), print(NNewY), nl,
     map_element(NextS, NextL, NNewX, NNewY),
     retract(map_element(NextS, NextL, NNewX, NNewY)),
@@ -238,39 +238,8 @@ moveEnemy(A) :-
     write(NewList), nl,
     asserta(map_element(NextS, NewList, NNewX, NNewY)).
 
-moveEnemyHelper(X, Y, NewX, NewY) :-
-    X = 1, Y = 1,
-    isEnemyHere(X, Y + 1),
-    isEnemyHere(X + 1, Y),
-    isEnemyHere(X + 1, Y + 1),
-    !,
-    NewX is X, NewY is Y.
-
-moveEnemyHelper(X, Y, NewX, NewY) :-
-    X = 1, Y = 12,
-    isEnemyHere(X, Y - 1),
-    isEnemyHere(X + 1, Y),
-    isEnemyHere(X + 1, Y - 1),
-    !,
-    NewX is X, NewY is Y.
-
-moveEnemyHelper(X, Y, NewX, NewY) :-
-    X = 12, Y = 1,
-    isEnemyHere(X, Y + 1),
-    isEnemyHere(X - 1, Y),
-    isEnemyHere(X - 1, Y + 1),
-    !,
-    NewX is X, NewY is Y.
-
-moveEnemyHelper(X, Y, NewX, NewY) :-
-    X = 12, Y = 12,
-    isEnemyHere(X, Y - 1),
-    isEnemyHere(X - 1, Y),
-    isEnemyHere(X - 1, Y - 1),
-    !,
-    NewX is X, NewY is Y.
-
-moveEnemyHelper(X, Y, NewX, NewY) :-
+moveEnemyHelper(X, Y, NewX, NewY, It) :-
+    (It > 9),     
     random(-1, 2, NewDX),
     random(-1, 2, NewDY),
     NX is X + NewDX, NY is Y + NewDY,
@@ -279,8 +248,21 @@ moveEnemyHelper(X, Y, NewX, NewY) :-
     !,
     NewX is NNewX, NewY is NNewY.
 
-moveEnemyHelper(X, Y, NewX, NewY) :-
-    moveEnemyHelper(X, Y, NNewX, NNewY),
+moveEnemyHelper(X, Y, NewX, NewY, It) :-
+    (It < 10),
+    random(-1, 2, NewDX),
+    random(-1, 2, NewDY),
+    NX is X + NewDX, NY is Y + NewDY,
+    normalizePosition(NX, NY, NNewX, NNewY),
+    \+isEnemyHere(NNewX, NNewY),
+    map_element(L,_,NNewX,NNewY),
+    \+(L == 'X'),
+    !,
+    NewX is NNewX, NewY is NNewY.
+
+moveEnemyHelper(X, Y, NewX, NewY, It) :-
+    Itx is It+1,
+    moveEnemyHelper(X, Y, NNewX, NNewY, Itx),
     NewX is NNewX, NewY is NNewY.
 
 isEnemyHere(X, Y) :-
