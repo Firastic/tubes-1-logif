@@ -18,24 +18,24 @@
   ### Kedua
   * Buka CMD
   * Tulis
-  '''
+  ```
   $ gplc main.pl
-  '''
+  ```
   * Jalankan via cmd
-  '''
+  ```
   $ main
-  '''
+  ```
   atau untuk Ubuntu
-  '''
+  ```
   $ ./main
-  '''
+  ```
   ### Ketiga
   Jalankan langsung main.pl dengan gprolog.
 
 ## How To Play
-  Setelah membuka dan compile terhadap main.pl sukses, gunakan command '''|- start. ''' untuk memulai menjalankan game.
+  Setelah membuka dan compile terhadap main.pl sukses, gunakan command ```|- start. ``` untuk memulai menjalankan game.
   ### Fungsi dalam Game
-  '''
+  ```
   Perintah yang dapat anda jalankan.
   start. -- Mulai game                                                     
   help. -- Memunculkan perintah-perintah yang diperlukan                  
@@ -50,9 +50,9 @@
   status. -- Menunjukkan status gim Anda sekarang!                        
   save(namafile.txt). -- Menyimpan file game Anda!                         
   load(namafile.txt). -- Memasukkan data dari file ke game. 
-  '''
+  ```
   ### Simbol simbol dalam Game
-  '''
+  ```
   Beberapa simbol yang Anda perlu tahu:                                   
   S = Senjata                                                             
   L = Ammo/Logistik(nama lainnya pelor lah)                               
@@ -62,7 +62,7 @@
   M = Musuh                                                               
   - = Petak yang bisa diakses                                             
   X = Zona mati. Jangan bergerak ke Zona ini!              
-  '''
+  ```
   
 ## How To Win
   Untuk menyelesaikan dan memenangkan game ini, anda cukup menjadi orang terakhir yang tersisa, yaitu dengan membunuh semua musuh yang ada.
