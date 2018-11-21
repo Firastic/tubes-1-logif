@@ -1,4 +1,11 @@
 # Wangky's Adventure
+  Daftar Isi:
+  1. [Deskripsi Game](#deskripsi-game)
+  2. [Pre-Requisite](#pre-requisite)
+  3. [Inisialisasi Game](#inisialisasi-game)
+  4. [How To Play](#how-to-play)
+  5. [How To Win](#how-to-win)
+  6. [Fail State](#fail-state)
 ## Deskripsi Game
   Dalam Game ini, anda akan bermain sebagai Wangky. Wangky adalah seorang pejuang muda dengan jiwa Nasionalis yang tinggi. Berbekal senjata - senjata seadanya, anda harus bertahan dalam medan pertempuran dan menghabisi semua musuh Indonesia. Mereka adalah Tentara Belanda, Tentara Jepang, Antek PKI bahkan hingga Koruptor yang melegenda. Mampukah anda memerankan wangky menaklukan medan pertempuran ini? Uji kemampuan Anda dalam game ini.
   
@@ -8,7 +15,7 @@
   2. Seluruh file dalam Repo ini.
   3. Your time and determination, trust me, game ini susah.
 
-## Initialisasi Game
+## Inisialisasi Game
   Untuk memainkan game ini, anda bisa menggunakan salah 1 dari 3 cara berikut.
   ### Pertama
   * Buka GNU Prolog
