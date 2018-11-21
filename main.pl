@@ -9,6 +9,7 @@
 :-dynamic(weapon/3).
 :-dynamic(inInventory/2).
 :-dynamic(isNPC/1).
+:-dynamic(isCheat/1).
 
 /*
 armor(player,0).
@@ -325,7 +326,9 @@ normalizePosition(X, Y, XN, YN) :-
 normalizePosition(X, Y, XN, YN) :-
     XN is X, YN is Y.
 
-moveAllEnemy :-
+moveAllEnemy :- isCheat(X),X,!.
+
+moveAllEnemy :-    
     forall(isNPC(A), moveEnemy(A)).
 
 moveFromTo(A1,B1,A2,B2) :-
@@ -1053,22 +1056,23 @@ updatemapkolom(N) :-
   retract(map_element(_,X11,11,N)), asserta(map_element('X',X11,11,N)),
   retract(map_element(_,X12,12,N)), asserta(map_element('X',X12,12,N)).
 
+tambahDeadZone :- isCheat(X),X,!.
 tambahDeadZone :-
-    countMove(A), A == 5,!,updatemapbaris(1).
+    countMove(A), A == 5,!,updatemapbaris(2).
 tambahDeadZone :-
-    countMove(A), A == 10,!,updatemapbaris(1).
+    countMove(A), A == 10,!,updatemapbaris(3).
 tambahDeadZone :-
-    countMove(A), A == 15,!,updatemapkolom(1).
+    countMove(A), A == 15,!,updatemapkolom(2).
 tambahDeadZone :-
-    countMove(A), A == 20,!,updatemapkolom(1).
+    countMove(A), A == 20,!,updatemapkolom(3).
 tambahDeadZone :-
-    countMove(A), A == 25,!,updatemapbaris(1),updatemapkolom(1).
+    countMove(A), A == 25,!,updatemapbaris(4),updatemapkolom(4).
 tambahDeadZone :-
-    countMove(A), A == 30,!,updatemapbaris(1),updatemapkolom(1).
+    countMove(A), A == 30,!,updatemapbaris(5),updatemapkolom(5).
 tambahDeadZone :-
-    countMove(A), A == 35,!,updatemapbaris(1),updatemapkolom(1).
+    countMove(A), A == 35,!,updatemapbaris(6),updatemapkolom(6).
 tambahDeadZone :-
-    countMove(A), A == 40,!,updatemapbaris(1),updatemapkolom(1).
+    countMove(A), A == 40,!,updatemapbaris(7),updatemapkolom(7).
 tambahDeadZone.
 
 do(help):- help,!.
@@ -1090,7 +1094,7 @@ do(use(Item)) :- use(Item),!.
 do(take(Item)) :- take(Item),!.
 do(attack) :- attack,!.
 do(_) :- write('Perintah tidak valid!'),nl.
-do(cheat) :- cheat.
+do(cheat) :- asserta(isCheat(true)), cheat.
 
 gameoverZonaMati :-
     position(A,B),
