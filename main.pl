@@ -229,7 +229,7 @@ moveEnemy(A) :-
     write(NL), nl,
     asserta(map_element(S, NL, X, Y)),
 
-    moveEnemyHelper(X, Y, NNewX, NNewY),
+    moveEnemyHelper(X, Y, NNewX, NNewY, 1),
     print(NNewX), print('spasi'), print(NNewY), nl,
     map_element(NextS, NextL, NNewX, NNewY),
     retract(map_element(NextS, NextL, NNewX, NNewY)),
@@ -238,39 +238,8 @@ moveEnemy(A) :-
     write(NewList), nl,
     asserta(map_element(NextS, NewList, NNewX, NNewY)).
 
-moveEnemyHelper(X, Y, NewX, NewY) :-
-    X = 1, Y = 1,
-    isEnemyHere(X, Y + 1),
-    isEnemyHere(X + 1, Y),
-    isEnemyHere(X + 1, Y + 1),
-    !,
-    NewX is X, NewY is Y.
-
-moveEnemyHelper(X, Y, NewX, NewY) :-
-    X = 1, Y = 12,
-    isEnemyHere(X, Y - 1),
-    isEnemyHere(X + 1, Y),
-    isEnemyHere(X + 1, Y - 1),
-    !,
-    NewX is X, NewY is Y.
-
-moveEnemyHelper(X, Y, NewX, NewY) :-
-    X = 12, Y = 1,
-    isEnemyHere(X, Y + 1),
-    isEnemyHere(X - 1, Y),
-    isEnemyHere(X - 1, Y + 1),
-    !,
-    NewX is X, NewY is Y.
-
-moveEnemyHelper(X, Y, NewX, NewY) :-
-    X = 12, Y = 12,
-    isEnemyHere(X, Y - 1),
-    isEnemyHere(X - 1, Y),
-    isEnemyHere(X - 1, Y - 1),
-    !,
-    NewX is X, NewY is Y.
-
-moveEnemyHelper(X, Y, NewX, NewY) :-
+moveEnemyHelper(X, Y, NewX, NewY, It) :-
+    (It > 9),     
     random(-1, 2, NewDX),
     random(-1, 2, NewDY),
     NX is X + NewDX, NY is Y + NewDY,
@@ -279,8 +248,21 @@ moveEnemyHelper(X, Y, NewX, NewY) :-
     !,
     NewX is NNewX, NewY is NNewY.
 
-moveEnemyHelper(X, Y, NewX, NewY) :-
-    moveEnemyHelper(X, Y, NNewX, NNewY),
+moveEnemyHelper(X, Y, NewX, NewY, It) :-
+    (It < 10),
+    random(-1, 2, NewDX),
+    random(-1, 2, NewDY),
+    NX is X + NewDX, NY is Y + NewDY,
+    normalizePosition(NX, NY, NNewX, NNewY),
+    \+isEnemyHere(NNewX, NNewY),
+    map_element(L,_,NNewX,NNewY),
+    \+(L == 'X'),
+    !,
+    NewX is NNewX, NewY is NNewY.
+
+moveEnemyHelper(X, Y, NewX, NewY, It) :-
+    Itx is It+1,
+    moveEnemyHelper(X, Y, NNewX, NNewY, Itx),
     NewX is NNewX, NewY is NNewY.
 
 isEnemyHere(X, Y) :-
@@ -1058,21 +1040,16 @@ updatemapkolom(N) :-
 
 tambahDeadZone :- isCheat(X),X,!.
 tambahDeadZone :-
-    countMove(A), A == 5,!,updatemapbaris(2).
+    countMove(A), A == 5,!,updatemapbaris(2),updatemapbaris(11), updatemapkolom(2),updatemapkolom(11).
 tambahDeadZone :-
-    countMove(A), A == 10,!,updatemapbaris(3).
+    countMove(A), A == 10,!,updatemapbaris(3),updatemapbaris(10), updatemapkolom(3),updatemapkolom(10).
 tambahDeadZone :-
-    countMove(A), A == 15,!,updatemapkolom(2).
+    countMove(A), A == 15,!,updatemapbaris(4),updatemapbaris(9), updatemapkolom(4),updatemapkolom(9).
 tambahDeadZone :-
-    countMove(A), A == 20,!,updatemapkolom(3).
+    countMove(A), A == 20,!,updatemapbaris(5),updatemapbaris(8), updatemapkolom(5),updatemapkolom(8).
 tambahDeadZone :-
-    countMove(A), A == 25,!,updatemapbaris(4),updatemapkolom(4).
-tambahDeadZone :-
-    countMove(A), A == 30,!,updatemapbaris(5),updatemapkolom(5).
-tambahDeadZone :-
-    countMove(A), A == 35,!,updatemapbaris(6),updatemapkolom(6).
-tambahDeadZone :-
-    countMove(A), A == 40,!,updatemapbaris(7),updatemapkolom(7).
+    countMove(A), A == 25,!,updatemapbaris(6),updatemapbaris(7), updatemapkolom(6),updatemapkolom(7).
+
 tambahDeadZone.
 
 do(help):- help,!.
