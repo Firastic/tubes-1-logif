@@ -1,4 +1,4 @@
-# BATTLE ROYALE
+# Wangky's Adventure
 ## Deskripsi Game
   Dalam Game ini, anda akan bermain sebagai Wangky. Wangky adalah seorang pejuang muda dengan jiwa Nasionalis yang tinggi. Berbekal senjata - senjata seadanya, anda harus bertahan dalam medan pertempuran dan menghabisi semua musuh Indonesia. Mereka adalah Tentara Belanda, Tentara Jepang, Antek PKI bahkan hingga Koruptor yang melegenda. Mampukah anda memerankan wangky menaklukan medan pertempuran ini? Uji kemampuan Anda dalam game ini.
   
