@@ -1137,24 +1137,143 @@ tambahDeadZone :-
     countMove(A), A == 25,!,updatemapbaris(6),updatemapbaris(7), updatemapkolom(6),updatemapkolom(7).
 tambahDeadZone.
 
-save(X) :-
-    open(X,write,Save),
+save(FileName) :-
+    open(FileName,write,Save),
+    %countMove
+    countMove(CM),
+    write(Save,CM),
+    write(Save,'.'),nl(Save),
+    
+    %Posisi
+    %Player
+    position(PX,PY),
+    write(Save,PX),
+    write(Save,'. '),
+    write(Save,PY),
+    write(Save,'.'), nl(Save),
+
+    %NPC
+    positionNPC(tentaraBelanda,TBX,TBY),
+    write(Save,TBX),
+    write(Save,'. '),
+    write(Save,TBY),
+    write(Save,'.'),nl(Save),
+
+    positionNPC(tentaraJepang,TJX,TJY),
+    write(Save,TJX),
+    write(Save,'. '),
+    write(Save,TJY),
+    write(Save,'.'),nl(Save),
+
+    positionNPC(koruptor,KX,KY),
+    write(Save,KX),
+    write(Save,'. '),
+    write(Save,KY),
+    write(Save,'.'),nl(Save),
+    
+    positionNPC(antekPKI,PKIX,PKIY),
+    write(Save,PKIX),
+    write(Save,'. '),
+    write(Save,PKIY),
+    write(Save,'.'),nl(Save),
+
+
+    %Status_Health
+    %Player
+    health(player,HP),
+    write(Save,HP),
+    write(Save,'.'),nl(Save),
+
+    %NPC
+    health(tentaraBelanda,TBHP),
+    write(Save,TBHP),
+    write(Save,'.'),nl(Save),
+    
+    health(tentaraJepang,TJHP),
+    write(Save,TJHP),
+    write(Save,'.'),nl(Save),
+    
+    health(koruptor,KHP),
+    write(Save,KHP),
+    write(Save,'.'),nl(Save),
+    
+    health(antekPKI,PKIHP),
+    write(Save,PKIHP),
+    write(Save,'.'),nl(Save),
+    
+
+    %Status_Armor
+    %Player
+    armor(player,DEF),
+    write(Save,DEF),
+    write(Save,'.'), nl(Save),
+    /*
+    %NPC
+    armor(tentaraBelanda,TBDEF),
+    write(Save,TBDEF),
+    write(Save,'.'), nl(Save),
+
+    armor(tentaraJepang,TJDEF),
+    write(Save,TJDEF),
+    write(Save,'.'), nl(Save),
+    
+    armor(koruptor,KDEF),
+    write(Save,DEF),
+    write(Save,'.'), nl(Save),
+
+    armor(antekPKI,PKIDEF),
+    write(Save,PKIDEF),
+    write(Save,'.'), nl(Save),
+    */
+
+    %Status_Weapon
+    %Player
+    weapon(player,Weapon, AmmoCount),
+    atom_concat(Weapon,'. ', WPN),
+    write(Save, WPN),
+    write(Save, AmmoCount),
+    write(Save, '.'), nl(Save),
+
+    %Status_Inventory
+    %Player
+    inInventory(player,LI),
+    write(Save,LI),
+    write(Save,'.'),nl(Save),
+
+    %NPC
+    inInventory(tentaraBelanda,TBLI),
+    write(Save,TBLI),
+    write(Save,'.'),nl(Save),
+    
+    inInventory(tentaraJepang,TJLI),
+    write(Save,TJLI),
+    write(Save,'.'),nl(Save),
+    
+    inInventory(koruptor,KLI),
+    write(Save,KLI),
+    write(Save,'.'),nl(Save),
+    
+    inInventory(antekPKI,PKILI),
+    write(Save,PKILI),
+    write(Save,'.'),nl(Save),
+
+    %Map_Element
     forall(between(1,12,I),
         (
             forall(between(1,12,J),
                 (
-                    write(I),
-                    write(J),
                     map_element(ME1,ME2,I,J),
-                    write(ME1), write(ME2),
                     atom_concat(ME1,'. ',ME3),
-                    write(ME3),
-                    nl,
-                    write(Save,ME3),write(Save,ME2),write(Save,'.'),nl(Save)
+                    write(Save,ME3),
+                    write(Save,ME2),write(Save,'.'),nl(Save)
                 )
             )
         )
-    ).
+    ),
+    
+    close(Save),
+    write('Save Berhasil').
+
 
 do(help):- help,!.
 do(map):-map,!.
@@ -1174,9 +1293,9 @@ do(status) :- status,!.
 do(use(Item)) :- use(Item),!.
 do(take(Item)) :- take(Item),!.
 do(attack) :- attack,!.
-do(_) :- write('Perintah tidak valid!'),nl.
 do(cheat) :- asserta(isCheat(true)), cheat.
-do(save(X)) :- save(X),!.
+do(save(FileName)) :- save(FileName),!.
+do(_) :- write('Perintah tidak valid!'),nl.
 
 gameoverZonaMati :-
     position(A,B),
