@@ -595,7 +595,7 @@ use(Item) :-
   asserta(inInventory(player,NewLI)),
   weaponAmmo(Item,AmmoType),
   AmmoType == none;
-  write('Kamu kini menggunakan '), write(Item), write(' sebagai senjata kamu'), nl,
+  write('Kamu kini menggunakan '), write(Item), write(' sebagai senjata kamu'), nl.
 
 use(Item) :-
   inInventory(player,LI),
@@ -1135,8 +1135,26 @@ tambahDeadZone :-
     countMove(A), A == 20,!,updatemapbaris(5),updatemapbaris(8), updatemapkolom(5),updatemapkolom(8).
 tambahDeadZone :-
     countMove(A), A == 25,!,updatemapbaris(6),updatemapbaris(7), updatemapkolom(6),updatemapkolom(7).
-
 tambahDeadZone.
+
+save(X) :-
+    open(X,write,Save),
+    forall(between(1,12,I),
+        (
+            forall(between(1,12,J),
+                (
+                    write(I),
+                    write(J),
+                    map_element(ME1,ME2,I,J),
+                    write(ME1), write(ME2),
+                    atom_concat(ME1,'. ',ME3),
+                    write(ME3),
+                    nl,
+                    write(Save,ME3),write(Save,ME2),write(Save,'.'),nl(Save)
+                )
+            )
+        )
+    ).
 
 do(help):- help,!.
 do(map):-map,!.
@@ -1158,6 +1176,7 @@ do(take(Item)) :- take(Item),!.
 do(attack) :- attack,!.
 do(_) :- write('Perintah tidak valid!'),nl.
 do(cheat) :- asserta(isCheat(true)), cheat.
+do(save(X)) :- save(X),!.
 
 gameoverZonaMati :-
     position(A,B),
