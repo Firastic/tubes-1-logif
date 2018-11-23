@@ -365,105 +365,107 @@ look_rek(A,B,C) :- look_pos(A,B), B1 is B+1, C1 is C+1, look_rek(A,B1,C1).
 look_desc(X,Y) :- map_element(_,_B,X,Y), _B == ['P'], !, write('Nyari apa kamu? gak ada apapun disini'),nl.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(tentaraBelanda,_B),
     write('Kamu melihat ada Tentara Belanda yang membawa senjata'),nl,
-    write('Gunakan command >attack. untuk menyerangnya'), nl.
+    write('Gunakan command >attack. untuk menyerangnya'), nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(tentaraJepang,_B), 
     write('Kamu melihat seorang tentara yang berteriak Banzai, Banzai, Banzai, '), nl,
     write('kamu sudah tahu artinya.'), nl,
-    write('Gunakan command >attack. untuk menyerang tentara wibu tersebut'),nl.
+    write('Gunakan command >attack. untuk menyerang tentara wibu tersebut'),nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(antekPKI,_B), 
     write('Penghianat yang ingin mengubah ideologi bangsa ini terdapat di depan matamu,'), nl,
     write(' dialah Antek PKI.'), nl,
-    write('Gunakan command >attack. untuk menyadarkan pentingnya pancasila padanya.'),nl.
+    write('Gunakan command >attack. untuk menyadarkan pentingnya pancasila padanya.'),nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(koruptor,_B),
     write('Wow, kamu menemukan Koruptor, musuh tulen bangsa ini.'), nl,
-    write('Gunakan command >attack. untuk menghapuskan eksistensinya.'),nl.
+    write('Gunakan command >attack. untuk menghapuskan eksistensinya.'),nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(keris,_B),
     write('Terdapat sebuah keris tergelatak disini. Diduga peninggalan dari jaman Majapahit.'),nl,
     write('Ambil dengan Command >take(keris). dan gunakan keris tersebut untuk '), nl,
-    write('menuntaskan semua musuh bangsa.'),nl.
+    write('menuntaskan semua musuh bangsa.'),nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(kujang,_B),
     write('Sejata khas barudak sunda, kujang tergelatak didepanmu'), nl, 
     write('Gunakan commad >take(kujang). untuk mewarisi semangat orang sunda '), nl,
-    write('menghabisi semua musuh Indonesia.'),nl.
+    write('menghabisi semua musuh Indonesia.'),nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(bambuRuncing,_B),
     write('Terdapat bambu runcing disini, senjata legendaris yang dikisahkan dalam '), nl,
     write('buku buku sejarah digunakan oleh pejuang sebelumnya.'),nl,
     write('Gunakan command >take(bambuRuncing). untuk mewarisi semangat pejuang '), nl,
-    write('terdahulu dan basmi mereka yang tersisa.'),nl.
+    write('terdahulu dan basmi mereka yang tersisa.'),nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(senapan,_B),
     write('WOW, kamu menemuka semua senapan kosong yang ditinggalkan oleh salah seorang tentara musuh'), nl, 
-    write('Ambil dengan command >take(senapan). dan buat pemilik senapan itu merasakan senjatanya senditi'), nl.
+    write('Ambil dengan command >take(senapan). dan buat pemilik senapan itu merasakan senjatanya senditi'), nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(sumpit,_B),
     write('Kamu melihat sebuah sumpit kosong disini, eits, itu bukan sumpit yang '), nl,
     write('digunakan orang orang china untuk makan, itu adalah sumpit yang digunakan '), nl,
     write('para pejuang dari timur.'), nl,
     write('Ambil dengan command >take(sumpit). dan warisi semangat orang timur '), nl,
     write('untuk memperbaiki negeri ini.'), nl, 
-    write('Jangan lupa mengisinya dengan anaksumpit terlebih dahulu.'),nl.
+    write('Jangan lupa mengisinya dengan anaksumpit terlebih dahulu.'),nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(duit,_B),
     write('WOW BOEY, kamu menemukan setumpuk duit yang ditinggalkan oleh anonimus.'), nl, 
     write('Kamu bisa menggunakannya sebagai senjata, namun apakah kamu tega melakukan '), nl,
     write('hal sama dengan para koruptor itu?'),nl,
-    write('Gunakan command >take(duit). untuk menyimpan uang tersebut.').
+    write('Gunakan command >take(duit). untuk menyimpan uang tersebut.'), nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(tameng,_B), 
     write('Hebat! Kamu menemukan tameng peninggalan kesatria jaman kerajaan.'), nl, 
     write('Ambil dengan command >take(tameng). dan gunakan untuk melindungi dirimu '), nl,
-    write('dan negeri ini dari mereka yang ingin menghancurkannya.'), nl.
+    write('dan negeri ini dari mereka yang ingin menghancurkannya.'), nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(zirah,_B), 
     write('SEBUAH ZIRAH YANG BERKILAU!!??? Tidak ada baju pelindung yang lebih kuat dari benda ini.'), nl, 
-    write('Ambil dengan command >take(zirah). dan gunakan untuk melindungi dirimu dari senjata musuh.'), nl.
+    write('Ambil dengan command >take(zirah). dan gunakan untuk melindungi dirimu dari senjata musuh.'), nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(helm,_B), 
     write('Kelihatannya ada yang menjatuhkan helmnya disini, aku merasa kasihan '), nl,
     write('jika dia sampai kena tilang karena helmnya tertinggal disini, tapi tenang, '), nl,
     write('ini medan pertempuran, tidak ada polisi lalu lintas disini.'), nl, 
-    write('Ambil dengan command >take(helm). dan lindungi kepalamu dari serangan musuh.'), nl.
+    write('Ambil dengan command >take(helm). dan lindungi kepalamu dari serangan musuh.'), nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(jimat,_B),
     write('Kamu menemukan sebuah jimat dengan kekuatan perlindungan magis yang sangat kuat.'), nl ,
     write('Konon katanya, seorang dukun yang sakti mandraguna membuat jimat tersebut.'), nl,
-    write('Ambil dengan command >take(jimat). untuk mengambil jimat tersebut.'), nl.
+    write('Ambil dengan command >take(jimat). untuk mengambil jimat tersebut.'), nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(batuAkik,_B),
     write('Artifak peninggalan zaman pra-sejarah, yang dimuat dalam sebuah cincin, '), nl,
     write('kamu menemukan sebuah batu Akik disini.'),nl,
     write('Konon katanya batu akik tersebut memiliki kekuatan magis yang dapat '), nl,
     write('membuat penggunanya kebal terhadap senjata tajam'),nl,
     write('Ambil dengan command >take(batuAkik). dan gunakan kekuatan tersebut '), nl,
-    write('agar dirimu bisa bertahan dalam neraka ini.'),nl.
+    write('agar dirimu bisa bertahan dalam neraka ini.'),nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(panadol,_B),
     write('Siapa orang Indonesia yang tidak tahu obat tersebut, Yap, kamu menemukan satu strip Panadol.'),nl,
     write('Mungkin aneh, tapi kamu bisa menggunakan panadol untuk mengobati luka lukamu.'),nl,
     write('Gunakan command >take(panadol). untuk menyimpan obat sakti tersebut agar kamu '), nl,
-    write('bisa menggunakannya kelak disaat saat genting.'),nl.
+    write('bisa menggunakannya kelak disaat saat genting.'),nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(obhCombi,_B),
     write('BATUK PAK HAJI? tiba tiba kata tersebut terlintas di pikiranmu'), nl,
     write('karena kamu baru saja menemukan sebotol OBH Combi.'),nl,
     write('Eits tapi, di dunia ini segala jenis obat bisa digunakan untuk '), nl,
     write('mengobati luka apapun itu, keren banget emang.'),nl,
     write('Gunakan command >take(obhCombi). untuk menyimpannya kedalam tasmu'), nl,
-    write('agar kamu makin terlihat seperti anak medis OSKM, eh agar kamu bisa mengobati luka lukamu nanti'),nl.
+    write('agar kamu makin terlihat seperti anak medis OSKM, eh agar kamu bisa mengobati luka lukamu nanti'),nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(minyakKayuPutih,_B),
     write('Apapun penyakit yang di derita kerokan adalah solusi utama orang Indonesia'),nl,
     write('dan WOW, kamu baru saja menemukan minyak kayu putih yang seringkali digunakan'),nl,
     write('untuk kerokan.'),nl,
     write('Gunakan command >take(minyakKayuPutih). untuk menyimpannya dalam tas kamu,'),nl,
     write('agar bisa digunakan kelak jika saja kamu masuk angin atau terkena tembakan'),nl,
-    write('dari tentara musuh, Who Knows?.'),nl.
+    write('dari tentara musuh, Who Knows?.'),nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(jamu,_B),
     write('Kamu menemukan sebuah jamu segala penyakit di depan matamu. Yap, itu adalah jamu all in one.'),nl,
-    write('Gunakan command >take(jamu). untuk mengambil dan menyimpan jamu tersebut ke dalam tas kamu'),nl.
+    write('Gunakan command >take(jamu). untuk mengambil dan menyimpan jamu tersebut ke dalam tas kamu'),nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(peluru,_B),
     write('Kamu menemukan 1 buah peluru senapan tergelatak tanpa pemilik disini.'),nl,
-    write('Ambil dengan command >take(peluru). untuk menyimpan peluru tersebut.'),nl.
+    write('Ambil dengan command >take(peluru). untuk menyimpan peluru tersebut.'),nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(anaksumpit,_B),
     write('Terdapat sebuah anaksumpit yang sudah dilumuri dengan racun yang mematikan di depan matamu.'),nl,
     write('ambil dengan command >take(anaksumpit). untuk menyimpannya di dalam tas kamu, '), nl,
-    write('dan INGAT, pastikan mengambil dengan sangat hati hati.'),nl.
+    write('dan INGAT, pastikan mengambil dengan sangat hati hati.'),nl, fail.
 look_desc(_,_) :- nl.
 
 look :- position(A,B),
         A1 is A-1,
         B1 is B-1,
         look_rek(A1,B1,1),
-        look_desc(A,B).
+        look_desc(A,B),
+        map_element(_,X,A,B),
+        write(X).
 
 cheathelper(N):-
       look_pos(N,1),
