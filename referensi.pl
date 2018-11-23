@@ -687,7 +687,9 @@ read(Str,Rekam9),
 read(Str,Rekam10),
 (Rekam10 == sudah -> append(['kunci_gembok'], New_List_tas3, New_List_tas4);append([], New_List_tas3, New_List_tas4)),
 read(Str,Rekam11),
-(Rekam11 == sudah -> append(['puisi'], New_List_tas4, New_List_tas5);append([], New_List_tas4, New_List_tas5)),
+
+(Rekam11 == sudah -> append(['puisi'], New_List_tas4, New_List_tas5); append([], New_List_tas4, New_List_tas5)),
+
 read(Str,Rekam12),
 (Rekam12 == sudah -> append(['mawar'], New_List_tas4, New_List_tas5);append([], New_List_tas4, New_List_tas5)),
 read(Str,Rekam13),

@@ -1177,7 +1177,6 @@ save(FileName) :-
     write(Save,PKIY),
     write(Save,'.'),nl(Save),
 
-
     %Status_Health
     %Player
     health(player,HP),
@@ -1201,30 +1200,11 @@ save(FileName) :-
     write(Save,PKIHP),
     write(Save,'.'),nl(Save),
     
-
     %Status_Armor
     %Player
     armor(player,DEF),
     write(Save,DEF),
     write(Save,'.'), nl(Save),
-    /*
-    %NPC
-    armor(tentaraBelanda,TBDEF),
-    write(Save,TBDEF),
-    write(Save,'.'), nl(Save),
-
-    armor(tentaraJepang,TJDEF),
-    write(Save,TJDEF),
-    write(Save,'.'), nl(Save),
-    
-    armor(koruptor,KDEF),
-    write(Save,DEF),
-    write(Save,'.'), nl(Save),
-
-    armor(antekPKI,PKIDEF),
-    write(Save,PKIDEF),
-    write(Save,'.'), nl(Save),
-    */
 
     %Status_Weapon
     %Player
@@ -1263,8 +1243,9 @@ save(FileName) :-
             forall(between(1,12,J),
                 (
                     map_element(ME1,ME2,I,J),
-                    atom_concat(ME1,'. ',ME3),
-                    write(Save,ME3),
+                    write(Save,'('),
+                    writeq(Save,ME1),
+                    write(Save,'). '),
                     write(Save,ME2),write(Save,'.'),nl(Save)
                 )
             )
@@ -1274,6 +1255,115 @@ save(FileName) :-
     close(Save),
     write('Save Berhasil').
 
+loadf(FileName):-
+    open(FileName,read,Baca),
+    %countMove
+    retract(countMove(_)),
+    read(Baca,CM),
+    asserta(countMove(CM)),
+
+    %Posisi
+    %Player
+    retract(position(_,_)),
+    read(Baca,PX),
+    read(Baca,PY),
+    asserta(position(PX,PY)),
+
+    %NPC
+    retract(positionNPC(tentaraBelanda,_,_)),
+    read(Baca,TBPX),
+    read(Baca,TBPY),
+    asserta(positionNPC(tentaraBelanda,TBPX,TBPY)),
+    
+    retract(positionNPC(tentaraJepang,_,_)),
+    read(Baca,TJPX),
+    read(Baca,TJPY),
+    asserta(positionNPC(tentaraJepang,TJPX,TJPY)),
+
+    retract(positionNPC(koruptor,_,_)),
+    read(Baca,KPX),
+    read(Baca,KPY),
+    asserta(positionNPC(koruptor,KPX,KPY)),
+
+    retract(positionNPC(antekPKI,_,_)),
+    read(Baca,PKIPX),
+    read(Baca,PKIPY),
+    asserta(positionNPC(antekPKI,PKIPX,PKIPY)),
+
+    %Status_Health
+    %Player
+    retract(health(player,_)),
+    read(Baca,HP),
+    asserta(health(player,HP)),
+
+    %NPC
+    retract(health(tentaraBelanda,_)),
+    read(Baca,TBHP),
+    asserta(health(tentaraBelanda,TBHP)),
+
+    retract(health(tentaraJepang,_)),
+    read(Baca,TJHP),
+    asserta(health(tentaraJepang,TJHP)),
+    
+    retract(health(koruptor,_)),
+    read(Baca,KHP),
+    asserta(health(koruptor,KHP)),
+
+    retract(health(antekPKI,_)),
+    read(Baca, PKIHP),
+    asserta(health(antekPKI,PKIHP)),
+
+    %Status_Armor
+    %Player
+    retract(armor(player,_)),
+    read(Baca, DEF),
+    asserta(armor(player,DEF)),
+
+    %Status_Weapon
+    %Player
+    
+    retract(weapon(player,_,_)),
+    read(Baca,WPN),
+    read(Baca,AmmoCount),
+    asserta(weapon(player,WPN,AmmoCount)),
+
+    %Status_Inventory
+    %Player
+    retract(inInventory(player,_)),
+    read(Baca,LI),
+    asserta(inInventory(player,LI)),
+
+    %NPC
+    retract(inInventory(tentaraBelanda,_)),
+    read(Baca,TBLI),
+    asserta(inInventory(tentaraBelanda,TBLI)),
+
+    retract(inInventory(tentaraJepang,_)),
+    read(Baca,TJLI),
+    asserta(inInventory(tentaraJepang,TJLI)),
+    
+    retract(inInventory(koruptor,_)),
+    read(Baca,KLI),
+    asserta(inInventory(koruptor,KLI)),
+
+    retract(inInventory(antekPKI,_)),
+    read(Baca,PKILI),
+    asserta(inInventory(antekPKI,PKILI)),
+    %Map_Element
+    forall(between(1,12,I),
+        (
+            forall(between(1,12,J),
+                (
+                    retract(map_element(_,_,I,J)),
+                    read(Baca,Type),
+                    read(Baca,Isi),
+                    asserta(map_element(Type,Isi,I,J))
+                )
+            )
+        )
+    ),
+    close(Baca),
+    write('Load Berhasil'),nl.
 
 do(help):- help,!.
 do(map):-map,!.
@@ -1295,6 +1385,7 @@ do(take(Item)) :- take(Item),!.
 do(attack) :- attack,!.
 do(cheat) :- asserta(isCheat(true)), cheat.
 do(save(FileName)) :- save(FileName),!.
+do(load(FileName)) :- loadf(FileName),!.
 do(_) :- write('Perintah tidak valid!'),nl.
 
 gameoverZonaMati :-
