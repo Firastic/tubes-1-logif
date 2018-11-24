@@ -237,3 +237,4 @@ positionNPC(tentaraBelanda,_,_).
 positionNPC(tentaraJepang,_,_).
 positionNPC(antekPKI,_,_).
 positionNPC(koruptor,_,_).
+isNPC(_).

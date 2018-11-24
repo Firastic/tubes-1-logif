@@ -12,6 +12,7 @@
 :-dynamic(isCheat/1).
 :-dynamic(bag/2).
 
+
 isWeapon(keris).
 isWeapon(kujang).
 isWeapon(bambuRuncing).
@@ -30,19 +31,16 @@ isMedicine(obhCombi).
 isMedicine(minyakKayuPutih).
 isMedicine(jamu).
 
-isNPC(tentaraBelanda).
-isNPC(tentaraJepang).
-isNPC(antekPKI).
-isNPC(koruptor).
+
 
 isBag(carrierBag).
 isBag(ransel).
 isBag(toteBag).
 
 bagAmmout(carrierBag, 25).
-bagAmmout(ransel, 20).
-bagAmmout(toteBag,15).
-bagAmmout(none, 10).
+bagAmmout(ransel, 15).
+bagAmmout(toteBag,10).
+bagAmmout(none, 5).
 
 health(tentaraBelanda, 100).
 health(tentaraJepang, 100).
@@ -71,11 +69,12 @@ medicine(obhCombi, 30).
 medicine(minyakKayuPutih, 40).
 medicine(jamu, 100).
 
-armorAmmount(zirah, 20).
-armorAmmount(tameng, 15).
-armorAmmount(helm, 10).
-armorAmmount(jimat, 10).
-armorAmmount(batuAkik, 50).
+armorAmmount(zirah, 10).
+armorAmmount(tameng,6).
+armorAmmount(helm, 2).
+armorAmmount(jimat, 2).
+armorAmmount(batuAkik, 20).
+
 
 start:-
     game_retractstart,!,
@@ -95,7 +94,7 @@ start:-
 	write('######### ##     ##  ##   ##  ##       ##  ####    ##    ##     ## ##   ##   ##       '),nl,
 	write('##     ## ##     ##   ## ##   ##       ##   ###    ##    ##     ## ##    ##  ##       '),nl,
 	write('##     ## ########     ###    ######## ##    ##    ##     #######  ##     ## ######## '),nl,nl,
-	
+
     write('  "Selamat Datang di Medan Pertempuran!"                                  '),nl,
     write('  Suara aneh yang seketika membangunkanmu dari tidurmu.                   '),nl,
     write('  Kamu mendapati dirimu terbangun di sebuah tempat antah berantah         '),nl,
@@ -127,7 +126,7 @@ start:-
     repeat,
     write('>'), read(A),
     do(A),nl,
-    (A == quit ; gameoverZonaMati; checkPlayerLife).
+    (A == quit ; gameoverZonaMati; checkPlayerLife;menang).
 
 help :-
   write('Perintah yang dapat Anda jalankan:                                         '),nl,
@@ -170,22 +169,6 @@ game_retractstart :-
   close(In).
 
 game_start:-
-  /*
-  open('map.txt',read,S),
-  read_file(S,Lines,1,1),
-  close(S).
-
-  read_file(S,H,A,B):-
-      at_end_of_stream(S),!.
-
-  read_file(S,[H|T],A,B):-
-        \+ at_end_of_stream(S),!,
-        read(S,H),
-        retract(map_element(_,_,A,B)),
-        asserta(map_element(H,' - ',A,B)),
-        write(H),nl, Bx is B+1,
-        read_file(S,T,A,Bx).
-  */
 
     open('mulaigim.txt',read,In),
     (
@@ -205,6 +188,7 @@ quit :-
   write(' Wangky gagal karena kamu :( ').
 
 map1(N):-
+<<<<<<< Updated upstream
   (map_element(A,_,N,1) -> write(' '),write(A)),
   (map_element(B,_,N,2) -> write(' '),write(B)),
   (map_element(C,_,N,3) -> write(' '),write(C)),
@@ -220,6 +204,23 @@ map1(N):-
   (map_element(M,_,N,13) -> write(' '), write(M)),
   (map_element(O,_,N,14) -> write(' '), write(O)),
   (map_element(P,_,N,15) -> write(' '), write(P)),nl.
+=======
+  (map_element(A,_,N,1) -> write(A)),write(' '),
+  (map_element(B,_,N,2) -> write(B)),write(' '),
+  (map_element(C,_,N,3) -> write(C)),write(' '),
+  (map_element(D,_,N,4) -> write(D)),write(' '),
+  (map_element(E,_,N,5) -> write(E)),write(' '),
+  (map_element(F,_,N,6) -> write(F)),write(' '),
+  (map_element(G,_,N,7) -> write(G)),write(' '),
+  (map_element(H,_,N,8) -> write(H)),write(' '),
+  (map_element(I,_,N,9) -> write(I)),write(' '),
+  (map_element(J,_,N,10) -> write(J)),write(' '),
+  (map_element(K,_,N,11) -> write(K)),write(' '),
+  (map_element(L,_,N,12) -> write(L)),write(' '),
+  (map_element(M,_,N,13) -> write(M)),write(' '),
+  (map_element(O,_,N,14) -> write(O)),write(' '),
+  (map_element(P,_,N,15) -> write(P)),nl.
+>>>>>>> Stashed changes
 
 call_map(N) :- N == 16, !.
 call_map(N) :- map1(N), N1 is N+1, call_map(N1).
@@ -227,7 +228,8 @@ call_map(N) :- map1(N), N1 is N+1, call_map(N1).
 map :- call_map(1).
 
 initEnemy :-
-    forall(isNPC(A), initEnemy(A)).
+    isNPC(ALL_ENEMY),
+    forall(member(A,ALL_ENEMY), initEnemy(A)).
 
 initEnemy(A) :-
     positionNPC(A, X, Y),
@@ -262,7 +264,7 @@ moveEnemy(A) :-
     asserta(map_element(NextS, NewList, NNewX, NNewY)).
 
 moveEnemyHelper(X, Y, NewX, NewY, It) :-
-    (It > 9),     
+    (It > 9),
     random(-1, 2, NewDX),
     random(-1, 2, NewDY),
     NX is X + NewDX, NY is Y + NewDY,
@@ -333,8 +335,9 @@ normalizePosition(X, Y, XN, YN) :-
 
 moveAllEnemy :- isCheat(X),X,!.
 
-moveAllEnemy :-    
-    forall(isNPC(A), moveEnemy(A)).
+moveAllEnemy :-
+    isNPC(ALL_ENEMY),
+    forall(member(A,ALL_ENEMY), moveEnemy(A)).
 
 moveFromTo(A1,B1,A2,B2) :-
     map_element('X',_,A2,B2),
@@ -365,11 +368,11 @@ n :- position(A,B), Ax is (A-1), moveFromTo(A,B,Ax,B), narasi_lokasi(Ax,B).
 e :- position(A,B), Bx is (B+1), moveFromTo(A,B,A,Bx), narasi_lokasi(A,Bx).
 w :- position(A,B), Bx is (B-1), moveFromTo(A,B,A,Bx), narasi_lokasi(A,Bx).
 
-narasi_lokasi(X,Y) :- 
+narasi_lokasi(X,Y) :-
     NS is X+1, NN is X-1, NE is Y+1, NW is Y-1,
-    write('s'),narasiHelper(NS,Y), 
-    write('n'),narasiHelper(NN,Y), 
-    write('e'),narasiHelper(X,NE), 
+    write('s'),narasiHelper(NS,Y),
+    write('n'),narasiHelper(NN,Y),
+    write('e'),narasiHelper(X,NE),
     write('w'),narasiHelper(X,NW).
 
 narasiHelper(A,B):-
@@ -393,7 +396,7 @@ narasiHelper(A,B):-
 
 narasiHelper(_,_):-
     write(' Menuju ke Deathzone').
-    
+
 look_pos(X,Y) :- map_element(A,_,X,Y), A == 'X', !, write(A).
 look_pos(X,Y) :- map_element(_,_B,X,Y), _B == [], !, write('-').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member(tentaraBelanda,_B), !, write('M').
@@ -432,11 +435,11 @@ look_desc(X,Y) :- map_element(_,_B,X,Y), _B == [player], !, write('Nyari apa kam
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(tentaraBelanda,_B),
     write('Kamu melihat ada Tentara Belanda yang membawa senjata'),nl,
     write('Gunakan command >attack. untuk menyerangnya'), nl, fail.
-look_desc(X,Y) :- map_element(_,_B,X,Y), member(tentaraJepang,_B), 
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(tentaraJepang,_B),
     write('Kamu melihat seorang tentara yang berteriak Banzai, Banzai, Banzai, '), nl,
     write('kamu sudah tahu artinya.'), nl,
     write('Gunakan command >attack. untuk menyerang tentara wibu tersebut'),nl, fail.
-look_desc(X,Y) :- map_element(_,_B,X,Y), member(antekPKI,_B), 
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(antekPKI,_B),
     write('Penghianat yang ingin mengubah ideologi bangsa ini terdapat di depan matamu,'), nl,
     write(' dialah Antek PKI.'), nl,
     write('Gunakan command >attack. untuk menyadarkan pentingnya pancasila padanya.'),nl, fail.
@@ -448,7 +451,7 @@ look_desc(X,Y) :- map_element(_,_B,X,Y), member(keris,_B),
     write('Ambil dengan Command >take(keris). dan gunakan keris tersebut untuk '), nl,
     write('menuntaskan semua musuh bangsa.'),nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(kujang,_B),
-    write('Sejata khas barudak sunda, kujang tergelatak didepanmu'), nl, 
+    write('Sejata khas barudak sunda, kujang tergelatak didepanmu'), nl,
     write('Gunakan commad >take(kujang). untuk mewarisi semangat orang sunda '), nl,
     write('menghabisi semua musuh Indonesia.'),nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(bambuRuncing,_B),
@@ -457,31 +460,31 @@ look_desc(X,Y) :- map_element(_,_B,X,Y), member(bambuRuncing,_B),
     write('Gunakan command >take(bambuRuncing). untuk mewarisi semangat pejuang '), nl,
     write('terdahulu dan basmi mereka yang tersisa.'),nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(senapan,_B),
-    write('WOW, kamu menemuka semua senapan kosong yang ditinggalkan oleh salah seorang tentara musuh'), nl, 
+    write('WOW, kamu menemuka semua senapan kosong yang ditinggalkan oleh salah seorang tentara musuh'), nl,
     write('Ambil dengan command >take(senapan). dan buat pemilik senapan itu merasakan senjatanya senditi'), nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(sumpit,_B),
     write('Kamu melihat sebuah sumpit kosong disini, eits, itu bukan sumpit yang '), nl,
     write('digunakan orang orang china untuk makan, itu adalah sumpit yang digunakan '), nl,
     write('para pejuang dari timur.'), nl,
     write('Ambil dengan command >take(sumpit). dan warisi semangat orang timur '), nl,
-    write('untuk memperbaiki negeri ini.'), nl, 
+    write('untuk memperbaiki negeri ini.'), nl,
     write('Jangan lupa mengisinya dengan anaksumpit terlebih dahulu.'),nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(duit,_B),
-    write('WOW BOEY, kamu menemukan setumpuk duit yang ditinggalkan oleh anonimus.'), nl, 
+    write('WOW BOEY, kamu menemukan setumpuk duit yang ditinggalkan oleh anonimus.'), nl,
     write('Kamu bisa menggunakannya sebagai senjata, namun apakah kamu tega melakukan '), nl,
     write('hal sama dengan para koruptor itu?'),nl,
     write('Gunakan command >take(duit). untuk menyimpan uang tersebut.'), nl, fail.
-look_desc(X,Y) :- map_element(_,_B,X,Y), member(tameng,_B), 
-    write('Hebat! Kamu menemukan tameng peninggalan kesatria jaman kerajaan.'), nl, 
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(tameng,_B),
+    write('Hebat! Kamu menemukan tameng peninggalan kesatria jaman kerajaan.'), nl,
     write('Ambil dengan command >take(tameng). dan gunakan untuk melindungi dirimu '), nl,
     write('dan negeri ini dari mereka yang ingin menghancurkannya.'), nl, fail.
-look_desc(X,Y) :- map_element(_,_B,X,Y), member(zirah,_B), 
-    write('SEBUAH ZIRAH YANG BERKILAU!!??? Tidak ada baju pelindung yang lebih kuat dari benda ini.'), nl, 
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(zirah,_B),
+    write('SEBUAH ZIRAH YANG BERKILAU!!??? Tidak ada baju pelindung yang lebih kuat dari benda ini.'), nl,
     write('Ambil dengan command >take(zirah). dan gunakan untuk melindungi dirimu dari senjata musuh.'), nl, fail.
-look_desc(X,Y) :- map_element(_,_B,X,Y), member(helm,_B), 
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(helm,_B),
     write('Kelihatannya ada yang menjatuhkan helmnya disini, aku merasa kasihan '), nl,
     write('jika dia sampai kena tilang karena helmnya tertinggal disini, tapi tenang, '), nl,
-    write('ini medan pertempuran, tidak ada polisi lalu lintas disini.'), nl, 
+    write('ini medan pertempuran, tidak ada polisi lalu lintas disini.'), nl,
     write('Ambil dengan command >take(helm). dan lindungi kepalamu dari serangan musuh.'), nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(jimat,_B),
     write('Kamu menemukan sebuah jimat dengan kekuatan perlindungan magis yang sangat kuat.'), nl ,
@@ -533,6 +536,7 @@ look :- position(A,B),
         map_element(_,X,A,B),
         write(X).
 
+
 cheathelper(N):-
       look_pos(N,1),
       look_pos(N,2),
@@ -567,7 +571,7 @@ status :-
     write('Weapon : '), write(W), nl,
     write('Ammo   : '), write(X), nl,
     write('Bag    : '), write(B), nl,
-    write('Isi Inventori : '), write('('), write(IA), write('/'),write(BA),write(')'), nl, 
+    write('Isi Inventori : '), write('('), write(IA), write('/'),write(BA),write(')'), nl,
     tulisInventory(LI).
 
 tulisInventory([])     :- write(' -Kosong-'), nl, !.
@@ -874,6 +878,20 @@ drop(Item) :-
     append(LPetak,[Item],NewLPetak),
     asserta(map_element(_,NewLPetak,A,B)).
 
+drop(Item) :-
+    inInventory(player,LI),
+    member(Item,LI),isBag(Item),!,write('Anda menjatuhkan Tas '),write(LI),nl,
+    retract(inInventory(player,LI)),
+    deleteOne(LI,Item,NewLI),
+    asserta(inInventory(player,NewLI)),
+    position(A,B),
+    retract(countMove(C)),
+    Cx is C+1,
+    asserta(countMove(Cx)),
+    retract(map_element(_,LPetak,A,B)),
+    append(LPetak,[Item],NewLPetak),
+    asserta(map_element(_,NewLPetak,A,B)).
+
 checkEnemy :-
     position(X, Y),
     map_element(_, L, X, Y),
@@ -937,8 +955,9 @@ attackHelper2(WEAPON_PLAYER) :-
     NEW_HEALTH is CURRENT_HEALTH - DAMAGE_PLAYER,
     asserta(health(NPC, NEW_HEALTH)),
     write('Nyawa '), write(NPC), write(' berkurang '), write(DAMAGE_PLAYER), write('!'), nl,
+    write('Nyawa '), write(NPC), write(' sekarang tinggal '), write(NEW_HEALTH),nl,
     attackHelper3,!.
-	
+
 attackHelper2(WEAPON_PLAYER) :-
     weaponAmmo(WEAPON_PLAYER, AMMO_TYPE),
     weapon(player,WEAPON_PLAYER,AMMO_AMMOUNT),
@@ -956,7 +975,7 @@ attackHelper2(WEAPON_PLAYER) :-
     inInventory(player,INVENTORY_LIST),
     \+member(AMMO_TYPE,INVENTORY_LIST),
     write('Ammo kamu sedang kosong, dan di inventori mu tidak tersedia'), write(AMMO_TYPE),nl.
-	
+
 attackHelper2(WEAPON_PLAYER) :-
     weaponAmmo(WEAPON_PLAYER, AMMO_TYPE),
     weapon(player,WEAPON_PLAYER,AMMO_AMMOUNT),
@@ -975,20 +994,43 @@ attackHelper2(WEAPON_PLAYER) :-
     NEW_HEALTH is CURRENT_HEALTH - DAMAGE_PLAYER,
     asserta(health(NPC, NEW_HEALTH)),
     write('Nyawa '), write(NPC), write(' berkurang '), write(DAMAGE_PLAYER), write('!'), nl,
+    write('Nyawa '), write(NPC), write(' sekarang tinggal '), write(NEW_HEALTH),nl,
     attackHelper3,!.
 
 %Enemy_Attacking_Player
-attackHelper3 :- 
+attackHelper3 :-
     position(X, Y),
     positionNPC(NPC, X, Y),
     health(NPC, HEALTH_NPC),
     HEALTH_NPC > 0,
     inInventory(NPC, [WEAPON_NPC|_]),
+    armor(player,ARMOR_AMMOUNT),
     damage(WEAPON_NPC, DAMAGE_NPC),
-    write(NPC), write(' menyerang kamu! Nyawa kamu berkurang '), write(DAMAGE_NPC), write('!'), nl,
+    DIVIDE_DAMAGE is ARMOR_AMMOUNT,
+    DAMAGE_NOW is DAMAGE_NPC - DIVIDE_DAMAGE,
+    DAMAGE_NOW>0,!,
+    write(NPC), write(' menyerang kamu! Nyawa kamu berkurang '),
+    write(DAMAGE_NOW), write('!'), nl,
     retract(health(player, CURRENT_HEALTH)),
-    NEW_HEALTH is CURRENT_HEALTH - DAMAGE_NPC,
+    NEW_HEALTH is CURRENT_HEALTH - DAMAGE_NOW,
     asserta(health(player, NEW_HEALTH)).
+
+attackHelper3 :-
+    position(X, Y),
+    positionNPC(NPC, X, Y),
+    health(NPC, HEALTH_NPC),
+    HEALTH_NPC > 0,
+    inInventory(NPC, [WEAPON_NPC|_]),
+    armor(player,ARMOR_AMMOUNT),
+    damage(WEAPON_NPC, DAMAGE_NPC),
+    DIVIDE_DAMAGE is ARMOR_AMMOUNT,
+    DAMAGE_NOW is DAMAGE_NPC - DIVIDE_DAMAGE,
+    \+DAMAGE_NOW>0,!,
+    write(NPC), write(' menyerang kamu! Nyawa kamu berkurang sebanyak 0!'),
+    nl,
+    write('Armor kamu terlalu kuat!'),
+    nl.
+
 
 attackHelper3 :-
     position(X, Y),
@@ -1001,7 +1043,12 @@ attackHelper3 :-
     dropNPC(NPC),
     retract(map_element(S, L, X, Y)),
     deleteOne(L,NPC,NL),
-    asserta(map_element(S, NL, X, Y)).
+    asserta(map_element(S, NL, X, Y)),
+    isNPC(ALL_ENEMY),
+    member(NPC,ALL_ENEMY),
+    retract(isNPC(ALL_ENEMY)),
+    deleteOne(ALL_ENEMY,NPC,NEW_RECUCED_ENEMY),
+    asserta(isNPC(NEW_RECUCED_ENEMY)).
 
 dropNPC(NPC) :-
     retract(inInventory(NPC, INVENTORY_LIST)),
@@ -1355,7 +1402,7 @@ save(FileName) :-
     countMove(CM),
     write(Save,CM),
     write(Save,'.'),nl(Save),
-    
+
     %Posisi
     %Player
     position(PX,PY),
@@ -1382,7 +1429,7 @@ save(FileName) :-
     write(Save,'. '),
     write(Save,KY),
     write(Save,'.'),nl(Save),
-    
+
     positionNPC(antekPKI,PKIX,PKIY),
     write(Save,PKIX),
     write(Save,'. '),
@@ -1399,19 +1446,19 @@ save(FileName) :-
     health(tentaraBelanda,TBHP),
     write(Save,TBHP),
     write(Save,'.'),nl(Save),
-    
+
     health(tentaraJepang,TJHP),
     write(Save,TJHP),
     write(Save,'.'),nl(Save),
-    
+
     health(koruptor,KHP),
     write(Save,KHP),
     write(Save,'.'),nl(Save),
-    
+
     health(antekPKI,PKIHP),
     write(Save,PKIHP),
     write(Save,'.'),nl(Save),
-    
+
     %Status_Armor
     %Player
     armor(player,DEF),
@@ -1441,15 +1488,15 @@ save(FileName) :-
     inInventory(tentaraBelanda,TBLI),
     write(Save,TBLI),
     write(Save,'.'),nl(Save),
-    
+
     inInventory(tentaraJepang,TJLI),
     write(Save,TJLI),
     write(Save,'.'),nl(Save),
-    
+
     inInventory(koruptor,KLI),
     write(Save,KLI),
     write(Save,'.'),nl(Save),
-    
+
     inInventory(antekPKI,PKILI),
     write(Save,PKILI),
     write(Save,'.'),nl(Save),
@@ -1468,7 +1515,7 @@ save(FileName) :-
             )
         )
     ),
-    
+
     close(Save),
     write('Save Berhasil').
 
@@ -1491,7 +1538,7 @@ loadf(FileName):-
     read(Baca,TBPX),
     read(Baca,TBPY),
     asserta(positionNPC(tentaraBelanda,TBPX,TBPY)),
-    
+
     retract(positionNPC(tentaraJepang,_,_)),
     read(Baca,TJPX),
     read(Baca,TJPY),
@@ -1521,7 +1568,7 @@ loadf(FileName):-
     retract(health(tentaraJepang,_)),
     read(Baca,TJHP),
     asserta(health(tentaraJepang,TJHP)),
-    
+
     retract(health(koruptor,_)),
     read(Baca,KHP),
     asserta(health(koruptor,KHP)),
@@ -1538,7 +1585,7 @@ loadf(FileName):-
 
     %Status_Weapon
     %Player
-    
+
     retract(weapon(player,_,_)),
     read(Baca,WPN),
     read(Baca,AmmoCount),
@@ -1563,7 +1610,7 @@ loadf(FileName):-
     retract(inInventory(tentaraJepang,_)),
     read(Baca,TJLI),
     asserta(inInventory(tentaraJepang,TJLI)),
-    
+
     retract(inInventory(koruptor,_)),
     read(Baca,KLI),
     asserta(inInventory(koruptor,KLI)),
@@ -1616,6 +1663,7 @@ gameoverZonaMati :-
     write('KAMU KALAH! Lain Kali Jangan Mengenai Zona Mati ya!'),nl.
 
 menang :-
+  isNPC([]),!,
   write('                               ___________________________________________'),nl,
   write('                                        Persembahan kami, untuk Anda.     '),nl,
   write('                               ___________________________________________'),nl.
