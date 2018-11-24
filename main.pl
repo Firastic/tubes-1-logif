@@ -1288,7 +1288,7 @@ dropBagHelper(RanNum) :-
 
 dropRandomizer :-
 	countMove(CM),
-	TotalRandom is CM div 5,
+	TotalRandom is CM div 5 + 1,
 	forall(between(1,TotalRandom,_),
 		(
 			random(1, 10, RanNumber),
