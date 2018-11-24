@@ -440,8 +440,8 @@ look_desc(X,Y) :- map_element(_,_B,X,Y), member(bambuRuncing,_B),
     write('Gunakan command >take(bambuRuncing). untuk mewarisi semangat pejuang '), nl,
     write('terdahulu dan basmi mereka yang tersisa.'),nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(senapan,_B),
-    write('WOW, kamu menemuka semua senapan kosong yang ditinggalkan oleh salah seorang tentara musuh'), nl,
-    write('Ambil dengan command >take(senapan). dan buat pemilik senapan itu merasakan senjatanya senditi'), nl, fail.
+    write('WOW, kamu menemukan semua senapan kosong yang ditinggalkan oleh salah seorang tentara musuh'), nl,
+    write('Ambil dengan command >take(senapan). dan buat pemilik senapan itu merasakan senjatanya sendiri'), nl, fail.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(sumpit,_B),
     write('Kamu melihat sebuah sumpit kosong disini, eits, itu bukan sumpit yang '), nl,
     write('digunakan orang orang china untuk makan, itu adalah sumpit yang digunakan '), nl,
