@@ -78,31 +78,56 @@ armorAmmount(jimat, 10).
 armorAmmount(batuAkik, 50).
 
 start:-
-  game_retractstart,!,
-  game_start,!,
-  write('##          ###    ##      ##    ###    ##    ##         ##      ##    ###    ##    ##  ######   ##    ## ##    ## ####'),nl,
-  write('##         ## ##   ##  ##  ##   ## ##   ###   ##         ##  ##  ##   ## ##   ###   ## ##    ##  ##   ##   ##  ##  ####'),nl,
-  write('##        ##   ##  ##  ##  ##  ##   ##  ####  ##         ##  ##  ##  ##   ##  ####  ## ##        ##  ##     ####   ####'),nl,
-  write('##       ##     ## ##  ##  ## ##     ## ## ## ## ####    ##  ##  ## ##     ## ## ## ## ##   #### #####       ##     ## '),nl,
-  write('##       ######### ##  ##  ## ######### ##  #### ####    ##  ##  ## ######### ##  #### ##    ##  ##  ##      ##         '),nl,
-  write('##       ##     ## ##  ##  ## ##     ## ##   ###  ##     ##  ##  ## ##     ## ##   ### ##    ##  ##   ##     ##    #### '),nl,
-  write('######## ##     ##  ###  ###  ##     ## ##    ## ##       ###  ###  ##     ## ##    ##  ######   ##    ##    ##    #### '),nl,nl,
-  write('Selamat datang ke Gim yang mungkin menarik ini!                            '),nl,
-  write('Wangky adalah seorang pemuda nasionalis yang masih muda,tapi               '),nl,
-  write('sudah ndewo kalau urusan melawan penjajah.                                 '),nl,
-  write('Dengan keadaan Indonesia yang dijajah oleh tentara luar,                   '),nl,
-  write('Wangky dengan berani melawan para penjajah itu!                            '),nl,
-  write('Eits, jangan lupa. Ada juga musuh orang Indonesia loh!                     '),nl,
-  write('Alias koruptor yang ingin juga merusak citra Indonesia!                    '),nl,nl,
-  write('Pilihan ada di tangan Wangky sekarang.                                     '),nl,
-  write('Melawan musuh, atau membiarkan Indonesia... kalah.                         '),nl,
-  write('Mari bantu Wangky melawan musuh-musuh Indonesia!                           '),nl,nl,
-  help,
-  write('Mari lawan para musuh Indonesia sekarang!!!                                '),nl,nl,
-  repeat,
-  write('>'), read(A),
-  do(A),nl,
-  (A == quit ; gameoverZonaMati; checkPlayerLife).
+    game_retractstart,!,
+    game_start,!,
+	write('      ##      ##    ###    ##    ##  ######   ##    ## ##    ## ####  ######          '),nl,
+	write('      ##  ##  ##   ## ##   ###   ## ##    ##  ##   ##   ##  ##  #### ##    ##         '),nl,
+	write('      ##  ##  ##  ##   ##  ####  ## ##        ##  ##     ####    ##  ##               '),nl,
+	write('      ##  ##  ## ##     ## ## ## ## ##   #### #####       ##    ##    ######          '),nl,
+	write('      ##  ##  ## ######### ##  #### ##    ##  ##  ##      ##               ##         '),nl,
+	write('      ##  ##  ## ##     ## ##   ### ##    ##  ##   ##     ##         ##    ##         '),nl,
+	write('       ###  ###  ##     ## ##    ##  ######   ##    ##    ##          ######          '),nl,
+	write('                                                                                      '),nl,
+	write('   ###    ########  ##     ## ######## ##    ## ######## ##     ## ########  ######## '),nl,
+	write('  ## ##   ##     ## ##     ## ##       ###   ##    ##    ##     ## ##     ## ##       '),nl,
+	write(' ##   ##  ##     ## ##     ## ##       ####  ##    ##    ##     ## ##     ## ##       '),nl,
+	write('##     ## ##     ## ##     ## ######   ## ## ##    ##    ##     ## ########  ######   '),nl,
+	write('######### ##     ##  ##   ##  ##       ##  ####    ##    ##     ## ##   ##   ##       '),nl,
+	write('##     ## ##     ##   ## ##   ##       ##   ###    ##    ##     ## ##    ##  ##       '),nl,
+	write('##     ## ########     ###    ######## ##    ##    ##     #######  ##     ## ######## '),nl,nl,
+	
+    write('  "Selamat Datang di Medan Pertempuran!"                                  '),nl,
+    write('  Suara aneh yang seketika membangunkanmu dari tidurmu.                   '),nl,
+    write('  Kamu mendapati dirimu terbangun di sebuah tempat antah berantah         '),nl,
+    write('  kamu menemukan sebuah pesan di sebelah tempatmu terbangun,              '),nl,
+    write('  Pesan itu bertulisankan:                                                '),nl,
+    write('  "Wahai kamu pemuda yang senang bermalasan - malasan. Kini               '),nl,
+    write('   kami leluhurmu, memanggilmu kesini, ke Medan Pertempuran ini,          '),nl,
+    write('   agar kau tahu betapa beratnya melawan musuh- musuh bangsa,             '),nl,
+	write('   untuk kembali ke asalmu, kamu harus menjadi satu - satunya yang selamat'),nl,
+    write('   Semoga Sukses PEMUDA"                                                  '),nl,
+    write('  selain pesan itu, kamu juga menemukan sebuah peta                       '),nl,nl,
+	write('     X X X X X X X X X X X X X X X    '),nl,
+	write('     X              |            X    '),nl,
+	write('     X              |            X    '),nl,
+	write('     X    PADANG    |   SAVANA   X    '),nl,
+	write('     X    PASIR     |            X    '),nl,
+	write('     X              |            X    '),nl,
+	write('     X______________|            X    '),nl,
+	write('     X            |P|___________ X    '),nl,
+	write('     X            |              X    '),nl,
+	write('     X            |              X    '),nl,
+	write('     X   TUNDRA   |    HUTAN     X    '),nl,
+	write('     X            |              X    '),nl,
+	write('     X            |              X    '),nl,
+	write('     X            |              X    '),nl,
+	write('     X X X X X X X X X X X X X X X    '),nl,nl,
+    write(' Berjuanlah, Demi Dirimu, Keluargamu, Teman - Teman mu, dan Bangsamu, !!!'),nl,nl,
+	write('  Gunakan Command >help. untuk melihat apa saja yang bisa kamu lakukan! '),nl,
+    repeat,
+    write('>'), read(A),
+    do(A),nl,
+    (A == quit ; gameoverZonaMati; checkPlayerLife).
 
 help :-
   write('Perintah yang dapat Anda jalankan:                                         '),nl,
@@ -126,7 +151,7 @@ help :-
   write('   O = Obat                                                                '),nl,
   write('   P = Pemain                                                              '),nl,
   write('   M = Musuh                                                               '),nl,
-  write('   B = Tas                                                                 '),nl,
+  write('   T = Tas                                                                 '),nl,
   write('   - = Petak yang bisa diakses                                             '),nl,
   write('   X = Zona mati. Jangan bergerak ke Zona ini!                             '),nl,nl.
 
@@ -335,16 +360,42 @@ moveFromTo(A1,B1,A2,B2) :-
     asserta(countMove(Cx)),
     tambahDeadZone.
 
-s :- position(A,B), Ax is (A+1), moveFromTo(A,B,Ax,B).
-n :- position(A,B), Ax is (A-1), moveFromTo(A,B,Ax,B).
-e :- position(A,B), Bx is (B+1), moveFromTo(A,B,A,Bx).
-w :- position(A,B), Bx is (B-1), moveFromTo(A,B,A,Bx).
+s :- position(A,B), Ax is (A+1), moveFromTo(A,B,Ax,B), narasi_lokasi(Ax,B).
+n :- position(A,B), Ax is (A-1), moveFromTo(A,B,Ax,B), narasi_lokasi(Ax,B).
+e :- position(A,B), Bx is (B+1), moveFromTo(A,B,A,Bx), narasi_lokasi(A,Bx).
+w :- position(A,B), Bx is (B-1), moveFromTo(A,B,A,Bx), narasi_lokasi(A,Bx).
 
-%narasi_lokasi(X,Y) :- .
+narasi_lokasi(X,Y) :- 
+    NS is X+1, NN is X-1, NE is Y+1, NW is Y-1,
+    write('s'),narasiHelper(NS,Y), 
+    write('n'),narasiHelper(NN,Y), 
+    write('e'),narasiHelper(X,NE), 
+    write('w'),narasiHelper(X,NW).
 
+narasiHelper(A,B):-
+    A > 1, A < 8, B > 1, B < 9,!,
+    write(' selanjutnya menuju ke Padang Pasir Terbuka'),nl.
+
+narasiHelper(A,B):-
+    A > 1, A < 9, B > 8, B < 15,!,
+    write(' selanjutnya menuju ke Savana Terbuka'),nl.
+
+narasiHelper(A,B):-
+    A > 7, A < 15, B > 1, B < 8,!,
+    write(' selanjutnya menuju ke Tundra'),nl.
+
+narasiHelper(A,B):-
+    A > 8, A < 15, B > 7, B < 15,!,
+    write(' selanjutnya menuju ke Hutan'),nl.
+narasiHelper(A,B):-
+    A = 8, B = 8,!,
+    write(' selanjutnya menuju ke Titik Tengah Arena'),nl.
+
+narasiHelper(_,_):-
+    write(' Menuju ke Deathzone').
+    
 look_pos(X,Y) :- map_element(A,_,X,Y), A == 'X', !, write(A).
 look_pos(X,Y) :- map_element(_,_B,X,Y), _B == [], !, write('-').
-look_pos(X,Y) :- map_element(_,_B,X,Y), member('E',_B), !, write('E').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member(tentaraBelanda,_B), !, write('M').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member(tentaraJepang,_B), !, write('M').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member(antekPKI,_B), !, write('M').
@@ -360,9 +411,9 @@ look_pos(X,Y) :- map_element(_,_B,X,Y), member(zirah,_B), !, write('A').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member(helm,_B), !, write('A').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member(jimat,_B), !, write('A').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member(batuAkik,_B), !, write('A').
-look_pos(X,Y) :- map_element(_,_B,X,Y), member(toteBag,_B), !, write('B').
-look_pos(X,Y) :- map_element(_,_B,X,Y), member(carrierBag,_B), !, write('B').
-look_pos(X,Y) :- map_element(_,_B,X,Y), member(ransel,_B), !, write('B').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(toteBag,_B), !, write('T').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(carrierBag,_B), !, write('T').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(ransel,_B), !, write('T').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member(panadol,_B), !, write('O').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member(obhCombi,_B), !, write('O').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member(minyakKayuPutih,_B), !, write('O').
