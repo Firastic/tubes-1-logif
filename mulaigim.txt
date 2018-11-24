@@ -223,7 +223,7 @@ map_element('X',[],15,12).
 map_element('X',[],15,13).
 map_element('X',[],15,14).
 map_element('X',[],15,15).
-position(2,2).
+position(8,8).
 countMove(0).
 positionNPC(tentaraBelanda, 0, 0).
 positionNPC(tentaraJepang, 0, 0).
