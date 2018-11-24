@@ -232,9 +232,15 @@ inInventory(antekPKI,_).
 inInventory(koruptor,_).
 armor(player,_).
 health(player,_).
-weapon(player,_).
+weapon(player,_,_).
 positionNPC(tentaraBelanda,_,_).
 positionNPC(tentaraJepang,_,_).
 positionNPC(antekPKI,_,_).
 positionNPC(koruptor,_,_).
+health(tentaraBelanda,_).
+health(tentaraJepang,_).
+health(antekPKI,_).
+health(koruptor,_).
 isNPC(_).
+bag(player,_).
+isCheat(_).

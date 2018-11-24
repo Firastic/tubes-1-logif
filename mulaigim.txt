@@ -223,7 +223,7 @@ map_element('X',[],15,12).
 map_element('X',[],15,13).
 map_element('X',[],15,14).
 map_element('X',[],15,15).
-position(8,8).
+position(2,2).
 countMove(0).
 positionNPC(tentaraBelanda, 0, 0).
 positionNPC(tentaraJepang, 0, 0).
@@ -238,4 +238,9 @@ health(player,100).
 armor(player,0).
 weapon(player,none,0).
 bag(player,none).
+health(tentaraBelanda,0).
+health(tentaraJepang,0).
+health(antekPKI,0).
+health(koruptor,0).
 isNPC([tentaraBelanda,tentaraJepang,antekPKI,koruptor]).
+isCheat(false).
