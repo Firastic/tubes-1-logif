@@ -186,7 +186,6 @@ quit :-
   write(' Wangky gagal karena kamu :( ').
 
 map1(N):-
-<<<<<<< Updated upstream
   (map_element(A,_,N,1) -> write(A)),write(' '),
   (map_element(B,_,N,2) -> write(B)),write(' '),
   (map_element(C,_,N,3) -> write(C)),write(' '),
@@ -202,23 +201,6 @@ map1(N):-
   (map_element(M,_,N,13) -> write(M)),write(' '),
   (map_element(O,_,N,14) -> write(O)),write(' '),
   (map_element(P,_,N,15) -> write(P)),nl.
-=======
-  (map_element(A,_,N,1) -> write(' '),write(A)),
-  (map_element(B,_,N,2) -> write(' '),write(B)),
-  (map_element(C,_,N,3) -> write(' '),write(C)),
-  (map_element(D,_,N,4) -> write(' '),write(D)),
-  (map_element(E,_,N,5) -> write(' '),write(E)),
-  (map_element(F,_,N,6) -> write(' '),write(F)),
-  (map_element(G,_,N,7) -> write(' '),write(G)),
-  (map_element(H,_,N,8) -> write(' '),write(H)),
-  (map_element(I,_,N,9) -> write(' '),write(I)),
-  (map_element(J,_,N,10) -> write(' '), write(J)),
-  (map_element(K,_,N,11) -> write(' '), write(K)),
-  (map_element(L,_,N,12) -> write(' '), write(L)),
-  (map_element(M,_,N,13) -> write(' '), write(M)),
-  (map_element(O,_,N,14) -> write(' '), write(O)),
-  (map_element(P,_,N,15) -> write(' '), write(P)),nl.
->>>>>>> Stashed changes
 
 call_map(N) :- N == 16, !.
 call_map(N) :- map1(N), N1 is N+1, call_map(N1).
@@ -1515,6 +1497,11 @@ save(FileName) :-
         )
     ),
 
+    isCheat(CHEAT),
+    write(Save,CHEAT),
+    write(Save,'.'),
+    nl(Save),
+    
     close(Save),
     write('Save Berhasil').
 
@@ -1617,6 +1604,7 @@ loadf(FileName):-
     retract(inInventory(antekPKI,_)),
     read(Baca,PKILI),
     asserta(inInventory(antekPKI,PKILI)),
+
     %Map_Element
     forall(between(1,15,I),
         (
@@ -1630,6 +1618,11 @@ loadf(FileName):-
             )
         )
     ),
+
+    retract(isCheat(_)),
+    read(Baca,CHEAT),
+    asserta(isCheat(CHEAT)),
+
     close(Baca),
     write('Load Berhasil'),nl.
 
@@ -1664,19 +1657,19 @@ gameoverZonaMati :-
 menang :-
   isNPC([]),!,
   write('                                   ANDA BERHASIL MENGALAHKAN PARA MUSUH!  '),nl,
-  write('                               %-----------------------------------------%'),nl,
-  write('                                              Dibuat oleh:'),nl,nl,
-  write('                               %-----------------------------------------%'),nl,
-  write('                               %     TUGAS BESAR LOGIKA INFOMARTIKA      %'),nl,
-  write('                               %               Kelompok 1                %'),nl,
-  write('                               %           "WANGKY ADVENTURE"            %'),nl,
-  write('                               %                Kelas 01                 %'),nl,
-  write('                               %-----------------------------------------%'),nl,
-  write('                               % 13515026 - Achmad Fahrurrozi Maskur     %'),nl,
-  write('                               % 13515050 - Muhammad Umar Fariz Tumbuan  %'),nl,
-  write('                               % 13515092 - Diki Ardian Wirasandi        %'),nl,
-  write('                               % 13515125 - Muhammad Rafid Amrullah      %'),nl,
-  write('                               %-----------------------------------------%'),nl,
+  write('                               % ----------------------------------------- %'),nl,
+  write('                                               Dibuat oleh:'),nl,nl,
+  write('                               % ----------------------------------------- %'),nl,
+  write('                               %      TUGAS BESAR LOGIKA INFOMARTIKA       %'),nl,
+  write('                               %                Kelompok 1                 %'),nl,
+  write('                               %            "WANGKY ADVENTURE"             %'),nl,
+  write('                               %                 Kelas 01                  %'),nl,
+  write('                               % ----------------------------------------- %'),nl,
+  write('                               % 13517007 - Mohammad Ridwan Hady Arifin    %'),nl,
+  write('                               % 13517070 - Aidil Rezjki Suljztan Sywaludin%'),nl,
+  write('                               % 13517091 - Adyaksa Wisanggeni             %'),nl,
+  write('                               % 13517115 - Edward Busug Alexander Jaya    %'),nl,
+  write('                               % ----------------------------------------- %'),nl,
   write('      ##      ##    ###    ##    ##  ######   ##    ## ##    ## ####  ######          '),nl,
 	write('      ##  ##  ##   ## ##   ###   ## ##    ##  ##   ##   ##  ##  #### ##    ##         '),nl,
 	write('      ##  ##  ##  ##   ##  ####  ## ##        ##  ##     ####    ##  ##               '),nl,
