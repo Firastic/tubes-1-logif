@@ -160,7 +160,7 @@ game_start:-
     close(In),
 
     retract(map_element(_,_,2,2)),
-    asserta(map_element('P',['P'],2,2)),
+    asserta(map_element('P',['player'],2,2)),
 
     initEnemy.
 
@@ -180,11 +180,14 @@ map1(N):-
   (map_element(I,_,N,9) -> write(I)),
   (map_element(J,_,N,10) -> write(J)),
   (map_element(K,_,N,11) -> write(K)),
-  (map_element(L,_,N,12) -> write(L)),nl.
+  (map_element(L,_,N,12) -> write(L)),
+  (map_element(M,_,N,13) -> write(M)),
+  (map_element(O,_,N,14) -> write(O)),
+  (map_element(P,_,N,15) -> write(P)),nl.
 
 
 
-call_map(N) :- N == 13, !.
+call_map(N) :- N == 16, !.
 call_map(N) :- map1(N), N1 is N+1, call_map(N1).
 
 map :- call_map(1).
@@ -196,8 +199,8 @@ initEnemy :-
 initEnemy(A) :-
     positionNPC(A, X, Y),
     retract(positionNPC(A, X, Y)),
-    random(2, 11, NewX),
-    random(2, 11, NewY),
+    random(2, 14, NewX),
+    random(2, 14, NewY),
     write('initposition'), write(NewX), write(NewY),nl,
     asserta(positionNPC(A, NewX, NewY)),
     map_element(S, L, NewX, NewY),
@@ -282,15 +285,15 @@ normalizePosition(X, Y, XN, YN) :-
     normalizePosition(X, YN, XN, YN).
 
 normalizePosition(X, Y, XN, YN) :-
-    X > 12,
+    X > 15,
     !,
-    XN is 12,
+    XN is 15,
     normalizePosition(XN, Y, XN, YN).
 
 normalizePosition(X, Y, XN, YN) :-
-    Y > 12,
+    Y > 15,
     !,
-    YN is 12,
+    YN is 15,
     normalizePosition(X, YN, XN, YN).
 
 normalizePosition(X, Y, XN, YN) :-
@@ -312,13 +315,13 @@ moveFromTo(A1,B1,A2,B2) :-
 moveFromTo(A1,B1,A2,B2) :-
     retract(position(A1,B1)),
     map_element(S, L, A1, B1),
-    delete(L,'P',LX),
+    delete(L,player,LX),
     retract(map_element(S,L,A1,B1)),
     asserta(map_element('-',LX,A1,B1)),
     asserta(position(A2,B2)),
     map_element(S1,L1,A2,B2),
     retract(map_element(S1,L1,A2,B2)),
-    append(L1,['P'],L1X),
+    append(L1,[player],L1X),
     asserta(map_element('P',L1X,A2,B2)),
     retract(countMove(C)),
     Cx is C+1,
@@ -329,6 +332,8 @@ s :- position(A,B), Ax is (A+1), moveFromTo(A,B,Ax,B).
 n :- position(A,B), Ax is (A-1), moveFromTo(A,B,Ax,B).
 e :- position(A,B), Bx is (B+1), moveFromTo(A,B,A,Bx).
 w :- position(A,B), Bx is (B-1), moveFromTo(A,B,A,Bx).
+
+%narasi_lokasi(X,Y) :- .
 
 look_pos(X,Y) :- map_element(A,_,X,Y), A == 'X', !, write(A).
 look_pos(X,Y) :- map_element(_,_B,X,Y), _B == [], !, write('-').
@@ -354,7 +359,7 @@ look_pos(X,Y) :- map_element(_,_B,X,Y), member(minyakKayuPutih,_B), !, write('O'
 look_pos(X,Y) :- map_element(_,_B,X,Y), member(jamu,_B), !, write('O').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member(peluru,_B), !, write('T').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member(anaksumpit,_B), !, write('T').
-look_pos(X,Y) :- map_element(_,_B,X,Y), member('P',_B), !, write('P').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(player,_B), !, write('P').
 look_pos(X,Y) :- map_element(_,_B,X,Y), write('P').
 
 look_rek(_,_,C) :- C == 10, !.
@@ -362,7 +367,7 @@ look_rek(A,B,C) :-  0 is mod(C,3), !, look_pos(A,B), nl,
                     A1 is A+1, B1 is B-2, C1 is C+1, look_rek(A1,B1,C1).
 look_rek(A,B,C) :- look_pos(A,B), B1 is B+1, C1 is C+1, look_rek(A,B1,C1).
 
-look_desc(X,Y) :- map_element(_,_B,X,Y), _B == ['P'], !, write('Nyari apa kamu? gak ada apapun disini'),nl.
+look_desc(X,Y) :- map_element(_,_B,X,Y), _B == [player], !, write('Nyari apa kamu? gak ada apapun disini'),nl.
 look_desc(X,Y) :- map_element(_,_B,X,Y), member(tentaraBelanda,_B),
     write('Kamu melihat ada Tentara Belanda yang membawa senjata'),nl,
     write('Gunakan command >attack. untuk menyerangnya'), nl, fail.
@@ -462,7 +467,7 @@ look_desc(_,_) :- nl.
 look :- position(A,B),
         A1 is A-1,
         B1 is B-1,
-        look_rek(A1,B1,1),
+        look_rek(A1,B1,1),nl,
         look_desc(A,B),
         map_element(_,X,A,B),
         write(X).
@@ -479,11 +484,14 @@ cheathelper(N):-
       look_pos(N,9),
       look_pos(N,10),
       look_pos(N,11),
-      look_pos(N,12),nl.
+      look_pos(N,12),
+	  look_pos(N,13),
+      look_pos(N,14),
+      look_pos(N,15),nl.
 
 cheat :-
     cheathelper(1),cheathelper(2),cheathelper(3),cheathelper(4),cheathelper(5),cheathelper(6),cheathelper(7),
-    cheathelper(8),cheathelper(9),cheathelper(10),cheathelper(11),cheathelper(12).
+    cheathelper(8),cheathelper(9),cheathelper(10),cheathelper(11),cheathelper(12),cheathelper(13),cheathelper(14),cheathelper(15).
 
 status :-
     inInventory(player,LI),
@@ -723,7 +731,7 @@ attack :-
     position(X, Y),
     map_element(_, _, X, Y),
     checkEnemy,
-    attackHelper1,
+    attackHelper1,!,
     write('ATTACK SEQUENCE 1'), nl.
 
 attack :-
@@ -732,16 +740,18 @@ attack :-
     \+checkEnemy,
     write('Tidak ada musuh disini!'), nl.
 
+%Weapon_Check
 attackHelper1 :-
     weapon(player, WEAPON_PLAYER,_),
     \+WEAPON_PLAYER = none,
-    attackHelper2(WEAPON_PLAYER).
+    attackHelper2(WEAPON_PLAYER),!.
 
 attackHelper1 :-
     weapon(player, WEAPON_PLAYER,_),
     WEAPON_PLAYER = none,
     write('Kamu tidak memegang senjata! Cari mati kamu?'), nl.
 
+%Player_Attack_Enemy
 attackHelper2(WEAPON_PLAYER) :-
     weaponAmmo(WEAPON_PLAYER, AMMO_TYPE),
     AMMO_TYPE = none,
@@ -754,33 +764,13 @@ attackHelper2(WEAPON_PLAYER) :-
     NEW_HEALTH is CURRENT_HEALTH - DAMAGE_PLAYER,
     asserta(health(NPC, NEW_HEALTH)),
     write('Nyawa '), write(NPC), write(' berkurang '), write(DAMAGE_PLAYER), write('!'), nl,
-    attackHelper3.
-
+    attackHelper3,!.
+	
 attackHelper2(WEAPON_PLAYER) :-
     weaponAmmo(WEAPON_PLAYER, AMMO_TYPE),
     weapon(player,WEAPON_PLAYER,AMMO_AMMOUNT),
     \+AMMO_TYPE = none,
-    AMMO_AMMOUNT > 0;
-    NEW_AMMO is AMMO_AMMOUNT -1,
-    retract(weapon(player,WEAPON_PLAYER,AMMO_AMMOUNT)),
-    asserta(weapon(player,WEAPON_PLAYER,NEW_AMMO)),
-    write(AMMO_TYPE), write(' berkurang 1!'), nl,
-    position(X, Y),
-    positionNPC(NPC, X, Y),
-    write('Kamu menyerang '), write(NPC), write('! Kasihan dia!'), nl,
-    health(NPC, CURRENT_HEALTH),
-    retract(health(NPC, CURRENT_HEALTH)),
-    damage(WEAPON_PLAYER, DAMAGE_PLAYER),
-    NEW_HEALTH is CURRENT_HEALTH - DAMAGE_PLAYER,
-    asserta(health(NPC, NEW_HEALTH)),
-    write('Nyawa '), write(NPC), write(' berkurang '), write(DAMAGE_PLAYER), write('!'), nl,
-    attackHelper3.
-
-attackHelper2(WEAPON_PLAYER) :-
-    weaponAmmo(WEAPON_PLAYER, AMMO_TYPE),
-    weapon(player,WEAPON_PLAYER,AMMO_AMMOUNT),
-    \+AMMO_TYPE = none,
-    AMMO_AMMOUNT == 0,
+    AMMO_AMMOUNT == 0,!,
     inInventory(player,INVENTORY_LIST),
     member(AMMO_TYPE,INVENTORY_LIST),
     write('Ammo kamu sedang kosong reload dulu mz'),nl.
@@ -793,8 +783,29 @@ attackHelper2(WEAPON_PLAYER) :-
     inInventory(player,INVENTORY_LIST),
     \+member(AMMO_TYPE,INVENTORY_LIST),
     write('Ammo kamu sedang kosong, dan di inventori mu tidak tersedia'), write(AMMO_TYPE),nl.
+	
+attackHelper2(WEAPON_PLAYER) :-
+    weaponAmmo(WEAPON_PLAYER, AMMO_TYPE),
+    weapon(player,WEAPON_PLAYER,AMMO_AMMOUNT),
+    \+AMMO_TYPE = none,
+    AMMO_AMMOUNT > 0,!,
+    NEW_AMMO is AMMO_AMMOUNT -1,
+    retract(weapon(player,WEAPON_PLAYER,AMMO_AMMOUNT)),
+    asserta(weapon(player,WEAPON_PLAYER,NEW_AMMO)),
+    write(AMMO_TYPE), write(' berkurang 1!'), nl,
+    position(X, Y),
+    positionNPC(NPC, X, Y),
+    write('Kamu menyerang '), write(NPC), write('!'), nl,
+    health(NPC, CURRENT_HEALTH),
+    retract(health(NPC, CURRENT_HEALTH)),
+    damage(WEAPON_PLAYER, DAMAGE_PLAYER),
+    NEW_HEALTH is CURRENT_HEALTH - DAMAGE_PLAYER,
+    asserta(health(NPC, NEW_HEALTH)),
+    write('Nyawa '), write(NPC), write(' berkurang '), write(DAMAGE_PLAYER), write('!'), nl,
+    attackHelper3,!.
 
-attackHelper3 :-
+%Enemy_Attacking_Player
+attackHelper3 :- 
     position(X, Y),
     positionNPC(NPC, X, Y),
     health(NPC, HEALTH_NPC),
@@ -838,8 +849,8 @@ dropMedicine :-
 
 dropMedicineHelper(RanNum) :-
     RanNum = 1,
-    random(1, 12, RX),
-    random(1, 12, RY),
+    random(1, 15, RX),
+    random(1, 15, RY),
     goodRandomizer(RX, RY, RanX, RanY),
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
@@ -849,8 +860,8 @@ dropMedicineHelper(RanNum) :-
 
 dropMedicineHelper(RanNum) :-
     RanNum = 2,
-    random(1, 12, RX),
-    random(1, 12, RY),
+    random(1, 15, RX),
+    random(1, 15, RY),
     goodRandomizer(RX, RY, RanX, RanY),
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
@@ -860,8 +871,8 @@ dropMedicineHelper(RanNum) :-
 
 dropMedicineHelper(RanNum) :-
     RanNum = 3,
-    random(1, 12, RX),
-    random(1, 12, RY),
+    random(1, 15, RX),
+    random(1, 15, RY),
     goodRandomizer(RX, RY, RanX, RanY),
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
@@ -871,8 +882,8 @@ dropMedicineHelper(RanNum) :-
 
 dropMedicineHelper(RanNum) :-
     RanNum = 4,
-    random(1, 12, RX),
-    random(1, 12, RY),
+    random(1, 15, RX),
+    random(1, 15, RY),
     goodRandomizer(RX, RY, RanX, RanY),
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
@@ -886,8 +897,8 @@ dropArmor :-
 
 dropArmorHelper(RanNum) :-
     RanNum = 1,
-    random(1, 12, RX),
-    random(1, 12, RY),
+    random(1, 15, RX),
+    random(1, 15, RY),
     goodRandomizer(RX, RY, RanX, RanY),
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
@@ -897,8 +908,8 @@ dropArmorHelper(RanNum) :-
 
 dropArmorHelper(RanNum) :-
     RanNum = 2,
-    random(1, 12, RX),
-    random(1, 12, RY),
+    random(1, 15, RX),
+    random(1, 15, RY),
     goodRandomizer(RX, RY, RanX, RanY),
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
@@ -908,8 +919,8 @@ dropArmorHelper(RanNum) :-
 
 dropArmorHelper(RanNum) :-
     RanNum = 3,
-    random(1, 12, RX),
-    random(1, 12, RY),
+    random(1, 15, RX),
+    random(1, 15, RY),
     goodRandomizer(RX, RY, RanX, RanY),
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
@@ -919,8 +930,8 @@ dropArmorHelper(RanNum) :-
 
 dropArmorHelper(RanNum) :-
     RanNum = 4,
-    random(1, 12, RX),
-    random(1, 12, RY),
+    random(1, 15, RX),
+    random(1, 15, RY),
     goodRandomizer(RX, RY, RanX, RanY),
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
@@ -930,8 +941,8 @@ dropArmorHelper(RanNum) :-
 
 dropArmorHelper(RanNum) :-
     RanNum = 5,
-    random(1, 12, RX),
-    random(1, 12, RY),
+    random(1, 15, RX),
+    random(1, 15, RY),
     goodRandomizer(RX, RY, RanX, RanY),
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
@@ -945,8 +956,8 @@ dropWeapon :-
 
 dropWeaponHelper(RanNum) :-
     RanNum = 1,
-    random(1, 12, RX),
-    random(1, 12, RY),
+    random(1, 15, RX),
+    random(1, 15, RY),
     goodRandomizer(RX, RY, RanX, RanY),
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
@@ -956,8 +967,8 @@ dropWeaponHelper(RanNum) :-
 
 dropWeaponHelper(RanNum) :-
     RanNum = 2,
-    random(1, 12, RX),
-    random(1, 12, RY),
+    random(1, 15, RX),
+    random(1, 15, RY),
     goodRandomizer(RX, RY, RanX, RanY),
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
@@ -967,8 +978,8 @@ dropWeaponHelper(RanNum) :-
 
 dropWeaponHelper(RanNum) :-
     RanNum = 3,
-    random(1, 12, RX),
-    random(1, 12, RY),
+    random(1, 15, RX),
+    random(1, 15, RY),
     goodRandomizer(RX, RY, RanX, RanY),
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
@@ -978,8 +989,8 @@ dropWeaponHelper(RanNum) :-
 
 dropWeaponHelper(RanNum) :-
     RanNum = 4,
-    random(1, 12, RX),
-    random(1, 12, RY),
+    random(1, 15, RX),
+    random(1, 15, RY),
     goodRandomizer(RX, RY, RanX, RanY),
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
@@ -989,8 +1000,8 @@ dropWeaponHelper(RanNum) :-
 
 dropWeaponHelper(RanNum) :-
     RanNum = 5,
-    random(1, 12, RX),
-    random(1, 12, RY),
+    random(1, 15, RX),
+    random(1, 15, RY),
     goodRandomizer(RX, RY, RanX, RanY),
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
@@ -1000,8 +1011,8 @@ dropWeaponHelper(RanNum) :-
 
 dropWeaponHelper(RanNum) :-
     RanNum = 6,
-    random(1, 12, RX),
-    random(1, 12, RY),
+    random(1, 15, RX),
+    random(1, 15, RY),
     goodRandomizer(RX, RY, RanX, RanY),
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
@@ -1015,8 +1026,8 @@ dropAmmo :-
 
 dropAmmoHelper(RanNum) :-
     RanNum = 1,
-    random(1, 12, RX),
-    random(1, 12, RY),
+    random(1, 15, RX),
+    random(1, 15, RY),
     goodRandomizer(RX, RY, RanX, RanY),
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
@@ -1026,8 +1037,8 @@ dropAmmoHelper(RanNum) :-
 
 dropAmmoHelper(RanNum) :-
     RanNum = 2,
-    random(1, 12, RX),
-    random(1, 12, RY),
+    random(1, 15, RX),
+    random(1, 15, RY),
     goodRandomizer(RX, RY, RanX, RanY),
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
@@ -1036,8 +1047,14 @@ dropAmmoHelper(RanNum) :-
     asserta(map_element(S, NewL, RanX, RanY)).
 
 dropRandomizer :-
-    random(1, 6, RanNum),
-    dropRandomizerHelper(RanNum).
+	countMove(CM),
+	TotalRandom is CM div 5,
+	forall(between(1,TotalRandom,_),
+		(
+			random(1, 5, RanNum),
+			dropRandomizerHelper(RanNum)
+		)
+	).
 
 dropRandomizerHelper(RanNum) :-
     RanNum = 1,
@@ -1049,21 +1066,17 @@ dropRandomizerHelper(RanNum) :-
 
 dropRandomizerHelper(RanNum) :-
     RanNum = 3,
-    dropWeapon.
+    dropArmor.
 
 dropRandomizerHelper(RanNum) :-
     RanNum = 4,
-    dropMedicine.
-
-dropRandomizerHelper(RanNum) :-
-    RanNum = 5,
-    dropWeapon.
+    dropAmmo.
 
 goodRandomizer(X, Y, XN, YN) :-
     map_element(S, _, X, Y),
     S = 'X',
-    random(1, 12, XR),
-    random(1, 12, YR),
+    random(1, 15, XR),
+    random(1, 15, YR),
     goodRandomizer(XR, YR, XN, YN).
 
 goodRandomizer(X, Y, XN, YN) :-
@@ -1083,33 +1096,41 @@ updatemapbaris(N) :-
     retract(map_element(_,X9,N,9)), asserta(map_element('X',X9,N,9)),
     retract(map_element(_,X10,N,10)), asserta(map_element('X',X10,N,10)),
     retract(map_element(_,X11,N,11)), asserta(map_element('X',X11,N,11)),
-    retract(map_element(_,X12,N,12)), asserta(map_element('X',X12,N,12)).
+    retract(map_element(_,X12,N,12)), asserta(map_element('X',X12,N,12)),
+	retract(map_element(_,X13,N,13)), asserta(map_element('X',X13,N,13)),
+    retract(map_element(_,X14,N,14)), asserta(map_element('X',X14,N,14)),
+    retract(map_element(_,X15,N,15)), asserta(map_element('X',X15,N,15)).
 
 updatemapkolom(N) :-
-  retract(map_element(_,X1,1,N)), asserta(map_element('X',X1,1,N)),
-  retract(map_element(_,X2,2,N)), asserta(map_element('X',X2,2,N)),
-  retract(map_element(_,X3,3,N)), asserta(map_element('X',X3,3,N)),
-  retract(map_element(_,X4,4,N)), asserta(map_element('X',X4,4,N)),
-  retract(map_element(_,X5,5,N)), asserta(map_element('X',X5,5,N)),
-  retract(map_element(_,X6,6,N)), asserta(map_element('X',X6,6,N)),
-  retract(map_element(_,X7,7,N)), asserta(map_element('X',X7,7,N)),
-  retract(map_element(_,X8,8,N)), asserta(map_element('X',X8,8,N)),
-  retract(map_element(_,X9,9,N)), asserta(map_element('X',X9,9,N)),
-  retract(map_element(_,X10,10,N)), asserta(map_element('X',X10,10,N)),
-  retract(map_element(_,X11,11,N)), asserta(map_element('X',X11,11,N)),
-  retract(map_element(_,X12,12,N)), asserta(map_element('X',X12,12,N)).
+	retract(map_element(_,X1,1,N)), asserta(map_element('X',X1,1,N)),
+	retract(map_element(_,X2,2,N)), asserta(map_element('X',X2,2,N)),
+	retract(map_element(_,X3,3,N)), asserta(map_element('X',X3,3,N)),
+	retract(map_element(_,X4,4,N)), asserta(map_element('X',X4,4,N)),
+	retract(map_element(_,X5,5,N)), asserta(map_element('X',X5,5,N)),
+	retract(map_element(_,X6,6,N)), asserta(map_element('X',X6,6,N)),
+	retract(map_element(_,X7,7,N)), asserta(map_element('X',X7,7,N)),
+	retract(map_element(_,X8,8,N)), asserta(map_element('X',X8,8,N)),
+	retract(map_element(_,X9,9,N)), asserta(map_element('X',X9,9,N)),
+	retract(map_element(_,X10,10,N)), asserta(map_element('X',X10,10,N)),
+	retract(map_element(_,X11,11,N)), asserta(map_element('X',X11,11,N)),
+	retract(map_element(_,X12,12,N)), asserta(map_element('X',X12,12,N)),
+	retract(map_element(_,X13,13,N)), asserta(map_element('X',X13,13,N)),
+	retract(map_element(_,X14,14,N)), asserta(map_element('X',X14,14,N)),
+	retract(map_element(_,X15,15,N)), asserta(map_element('X',X15,15,N)).
 
 tambahDeadZone :- isCheat(X),X,!.
 tambahDeadZone :-
-    countMove(A), A == 5,!,updatemapbaris(2),updatemapbaris(11), updatemapkolom(2),updatemapkolom(11).
+    countMove(A), A == 5,!,updatemapbaris(2),updatemapbaris(14), updatemapkolom(2),updatemapkolom(14).
 tambahDeadZone :-
-    countMove(A), A == 10,!,updatemapbaris(3),updatemapbaris(10), updatemapkolom(3),updatemapkolom(10).
+    countMove(A), A == 12,!,updatemapbaris(3),updatemapbaris(13), updatemapkolom(3),updatemapkolom(13).
 tambahDeadZone :-
-    countMove(A), A == 15,!,updatemapbaris(4),updatemapbaris(9), updatemapkolom(4),updatemapkolom(9).
+    countMove(A), A == 21,!,updatemapbaris(4),updatemapbaris(12), updatemapkolom(4),updatemapkolom(12).
 tambahDeadZone :-
-    countMove(A), A == 20,!,updatemapbaris(5),updatemapbaris(8), updatemapkolom(5),updatemapkolom(8).
+    countMove(A), A == 32,!,updatemapbaris(5),updatemapbaris(11), updatemapkolom(5),updatemapkolom(11).
 tambahDeadZone :-
-    countMove(A), A == 25,!,updatemapbaris(6),updatemapbaris(7), updatemapkolom(6),updatemapkolom(7).
+    countMove(A), A == 45,!,updatemapbaris(6),updatemapbaris(10), updatemapkolom(6),updatemapkolom(10).
+tambahDeadZone :-
+    countMove(A), A == 50,!,updatemapbaris(7),updatemapbaris(9), updatemapkolom(7),updatemapkolom(9).
 tambahDeadZone.
 
 save(FileName) :-
@@ -1213,9 +1234,9 @@ save(FileName) :-
     write(Save,'.'),nl(Save),
 
     %Map_Element
-    forall(between(1,12,I),
+    forall(between(1,15,I),
         (
-            forall(between(1,12,J),
+            forall(between(1,15,J),
                 (
                     map_element(ME1,ME2,I,J),
                     write(Save,'('),
@@ -1325,9 +1346,9 @@ loadf(FileName):-
     read(Baca,PKILI),
     asserta(inInventory(antekPKI,PKILI)),
     %Map_Element
-    forall(between(1,12,I),
+    forall(between(1,15,I),
         (
-            forall(between(1,12,J),
+            forall(between(1,15,J),
                 (
                     retract(map_element(_,_,I,J)),
                     read(Baca,Type),
