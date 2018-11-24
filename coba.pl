@@ -1,0 +1,16 @@
+wrote :-
+write(' X X X X X X X X X X X X X X X'),nl,
+write(' X - - - - - - - - - - - - - X'),nl,
+write(' X - - - - - - - - - - - - - X'),nl,
+write(' X - - - - - - - - - - - - - X'),nl,
+write(' X - - - - - - - - - - - - - X'),nl,
+write(' X - - - - - - - - - - - - - X'),nl,
+write(' X - - - - - - - - - - - - - X'),nl,
+write(' X - - - - - - P - - - - - - X'),nl,
+write(' X - - - - - - - - - - - - - X'),nl,
+write(' X - - - - - - - - - - - - - X'),nl,
+write(' X - - - - - - - - - - - - - X'),nl,
+write(' X - - - - - - - - - - - - - X'),nl,
+write(' X - - - - - - - - - - - - - X'),nl,
+write(' X - - - - - - - - - - - - - X'),nl,
+write(' X X X X X X X X X X X X X X X').
