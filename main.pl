@@ -38,7 +38,7 @@ isBag(toteBag).
 bagAmmout(carrierBag, 25).
 bagAmmout(ransel, 15).
 bagAmmout(toteBag,10).
-bagAmmout(none, 5).
+bagAmmout(none, 1).
 
 health(tentaraBelanda, 100).
 health(tentaraJepang, 100).
@@ -558,10 +558,12 @@ tulisInventory([])     :- write(' -Kosong-'), nl, !.
 tulisInventory([H|[]]) :- write(' -'),write(H), nl,!.
 tulisInventory([H|T])  :- write(' -'),write(H),nl, tulisInventory(T).
 
+
+
 take(Item) :-
     position(X, Y),
     write(X), write(' '), write(Y), nl,
-    map_element(_, L, X, Y),
+    map_element(A, L, X, Y),
     member(Item, L),
     bag(player, B),
     bagAmmout(B, BA),
@@ -575,9 +577,9 @@ take(Item) :-
     append(LI, [Item], NLI),
     write(NLI), nl,
     asserta(inInventory(player, NLI)),
-    retract(map_element(_, L, X, Y)),
+    retract(map_element(WAS_HERE, L, X, Y)),
     deleteOne(L, Item, LNEW),
-    asserta(map_element(_, LNEW, X, Y)),
+    asserta(map_element(WAS_HERE, LNEW, X, Y)),
     retract(countMove(C)),
 	    Cx is C+1,
     asserta(countMove(Cx)),
@@ -587,7 +589,7 @@ take(Item) :-
     write("DEBUG"),
     position(X, Y),
     write(X), write(' '), write(Y), nl,
-    map_element(_, L, X, Y),
+    map_element(WAS_HERE, L, X, Y),
     member(Item, L),
     bag(player, B),
     bagAmmout(B, BA),
@@ -604,7 +606,7 @@ take(Item) :-
 take(Item) :-
     position(X, Y),
     write(X), write(' '), write(Y), nl,
-    map_element(_, L, X, Y),
+    map_element(WAS_HERE, L, X, Y),
     write(Item), write(' '), write(L), nl,
     \+member(Item, L), !,
     retract(countMove(C)),
@@ -813,9 +815,9 @@ drop(Item) :-
     retract(countMove(C)),
 	    Cx is C+1,
     asserta(countMove(Cx)),
-    retract(map_element(_,LPetak,A,B)),
+    retract(map_element(WAS_HERE,LPetak,A,B)),
     append(LPetak,[Item],NewLPetak),
-    asserta(map_element(_,NewLPetak,A,B)).
+    asserta(map_element(WAS_HERE,NewLPetak,A,B)).
 
 drop(Item) :-
     inInventory(player,LI),
@@ -827,9 +829,9 @@ drop(Item) :-
     retract(countMove(C)),
 	    Cx is C+1,
     asserta(countMove(Cx)),
-    retract(map_element(_,LPetak,A,B)),
+    retract(map_element(WAS_HERE,LPetak,A,B)),
     append(LPetak,[Item],NewLPetak),
-    asserta(map_element(_,NewLPetak,A,B)).
+    asserta(map_element(WAS_HERE,NewLPetak,A,B)).
 
 drop(Item) :-
     inInventory(player,LI),
@@ -841,9 +843,9 @@ drop(Item) :-
     retract(countMove(C)),
 	    Cx is C+1,
     asserta(countMove(Cx)),
-    retract(map_element(_,LPetak,A,B)),
+    retract(map_element(WAS_HERE,LPetak,A,B)),
     append(LPetak,[Item],NewLPetak),
-    asserta(map_element(_,NewLPetak,A,B)).
+    asserta(map_element(WAS_HERE,NewLPetak,A,B)).
 
 drop(Item) :-
     inInventory(player,LI),
@@ -855,9 +857,9 @@ drop(Item) :-
     retract(countMove(C)),
 	    Cx is C+1,
     asserta(countMove(Cx)),
-    retract(map_element(_,LPetak,A,B)),
+    retract(map_element(WAS_HERE,LPetak,A,B)),
     append(LPetak,[Item],NewLPetak),
-    asserta(map_element(_,NewLPetak,A,B)).
+    asserta(map_element(WAS_HERE,NewLPetak,A,B)).
 
 drop(Item) :-
     inInventory(player,LI),
@@ -869,9 +871,9 @@ drop(Item) :-
     retract(countMove(C)),
     Cx is C+1,
     asserta(countMove(Cx)),
-    retract(map_element(_,LPetak,A,B)),
+    retract(map_element(WAS_HERE,LPetak,A,B)),
     append(LPetak,[Item],NewLPetak),
-    asserta(map_element(_,NewLPetak,A,B)).
+    asserta(map_element(WAS_HERE,NewLPetak,A,B)).
 
 checkEnemy :-
     position(X, Y),
@@ -1287,11 +1289,11 @@ dropBagHelper(RanNum) :-
 
 dropRandomizer :-
 	countMove(CM),
-	TotalRandom is CM div 5 + 1,
+	TotalRandom is CM div 10 + 1,
 	forall(between(1,TotalRandom,_),
 		(
 			random(1, 10, RanNumber),
-            RanNum is RanNumber mod 5,
+            RanNum is RanNumber mod 10,
 			dropRandomizerHelper(RanNum)
 		)
 	).
@@ -1313,8 +1315,10 @@ dropRandomizerHelper(RanNum) :-
     dropAmmo.
 
 dropRandomizerHelper(RanNum) :-
-    RanNum = 0,
+    RanNum = 5,
     dropBag.
+
+dropRandomizerHelper(RanNum).
 
 goodRandomizer(X, Y, XN, YN) :-
     map_element(S, _, X, Y),
@@ -1501,7 +1505,7 @@ save(FileName) :-
     write(Save,CHEAT),
     write(Save,'.'),
     nl(Save),
-    
+
     close(Save),
     write('Save Berhasil').
 
