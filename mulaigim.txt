@@ -237,3 +237,4 @@ inInventory(koruptor, [duit]).
 health(player,100).
 armor(player,0).
 weapon(player,none,0).
+bag(player,none).

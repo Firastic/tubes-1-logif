@@ -10,6 +10,7 @@
 :-dynamic(inInventory/2).
 :-dynamic(isNPC/1).
 :-dynamic(isCheat/1).
+:-dynamic(bag/2).
 
 isWeapon(keris).
 isWeapon(kujang).
@@ -33,7 +34,16 @@ isNPC(tentaraBelanda).
 isNPC(tentaraJepang).
 isNPC(antekPKI).
 isNPC(koruptor).
- 
+
+isBag(carrierBag).
+isBag(ransel).
+isBag(toteBag).
+
+bagAmmout(carrierBag, 25).
+bagAmmout(ransel, 20).
+bagAmmout(toteBag,15).
+bagAmmout(none, 10).
+
 health(tentaraBelanda, 100).
 health(tentaraJepang, 100).
 health(antekPKI, 100).
@@ -116,6 +126,7 @@ help :-
   write('   O = Obat                                                                '),nl,
   write('   P = Pemain                                                              '),nl,
   write('   M = Musuh                                                               '),nl,
+  write('   B = Tas                                                                 '),nl,
   write('   - = Petak yang bisa diakses                                             '),nl,
   write('   X = Zona mati. Jangan bergerak ke Zona ini!                             '),nl,nl.
 
@@ -185,15 +196,12 @@ map1(N):-
   (map_element(O,_,N,14) -> write(O)),
   (map_element(P,_,N,15) -> write(P)),nl.
 
-
-
 call_map(N) :- N == 16, !.
 call_map(N) :- map1(N), N1 is N+1, call_map(N1).
 
 map :- call_map(1).
 
 initEnemy :-
-
     forall(isNPC(A), initEnemy(A)).
 
 initEnemy(A) :-
@@ -219,7 +227,6 @@ moveEnemy(A) :-
     delete(L, A, NL),
     write(NL), nl,
     asserta(map_element(S, NL, X, Y)),
-
     moveEnemyHelper(X, Y, NNewX, NNewY, 1),
     print(NNewX), print('spasi'), print(NNewY), nl,
     map_element(NextS, NextL, NNewX, NNewY),
@@ -353,12 +360,15 @@ look_pos(X,Y) :- map_element(_,_B,X,Y), member(zirah,_B), !, write('A').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member(helm,_B), !, write('A').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member(jimat,_B), !, write('A').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member(batuAkik,_B), !, write('A').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(toteBag,_B), !, write('B').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(carrierBag,_B), !, write('B').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(ransel,_B), !, write('B').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member(panadol,_B), !, write('O').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member(obhCombi,_B), !, write('O').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member(minyakKayuPutih,_B), !, write('O').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member(jamu,_B), !, write('O').
-look_pos(X,Y) :- map_element(_,_B,X,Y), member(peluru,_B), !, write('T').
-look_pos(X,Y) :- map_element(_,_B,X,Y), member(anaksumpit,_B), !, write('T').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(peluru,_B), !, write('L').
+look_pos(X,Y) :- map_element(_,_B,X,Y), member(anaksumpit,_B), !, write('L').
 look_pos(X,Y) :- map_element(_,_B,X,Y), member(player,_B), !, write('P').
 look_pos(X,Y) :- map_element(_,_B,X,Y), write('P').
 
@@ -498,11 +508,16 @@ status :-
     health(player,H),
     armor(player,A),
     weapon(player,W,X),
+    bag(player,B),
+    bagAmmout(B,BA),
+    length(LI,IA),
     write('Health : '), write(H), nl,
     write('Armor  : '), write(A), nl,
     write('Weapon : '), write(W), nl,
     write('Ammo   : '), write(X), nl,
-    write('Isi Inventori : '),nl, tulisInventory(LI).
+    write('Bag    : '), write(B), nl,
+    write('Isi Inventori : '), write('('), write(IA), write('/'),write(BA),write(')'), nl, 
+    tulisInventory(LI).
 
 tulisInventory([])     :- write(' -Kosong-'), nl, !.
 tulisInventory([H|[]]) :- write(' -'),write(H), nl,!.
@@ -511,20 +526,44 @@ tulisInventory([H|T])  :- write(' -'),write(H),nl, tulisInventory(T).
 take(Item) :-
     position(X, Y),
     write(X), write(' '), write(Y), nl,
-    map_element(S, L, X, Y),
+    map_element(_, L, X, Y),
     member(Item, L), !,
+    bag(player, B),
+    bagAmmout(B, BA),
     write(Item), write(' '), write(L), nl,
     inInventory(player, LI),
+    length(LI, BNow),
+    BNow < BA, !,
     write(LI), nl,
     retract(inInventory(player, LI)),
     write(LI), nl,
     append(LI, [Item], NLI),
     write(NLI), nl,
     asserta(inInventory(player, NLI)),
-    retract(map_element(S, L, X, Y)),
+    retract(map_element(_, L, X, Y)),
     delete(L, Item, LNEW),
-    asserta(map_element(S, LNEW, X, Y)),
-    write(Item), write(' sudah diambil! Hebat Kamu!'), nl.
+    asserta(map_element(_, LNEW, X, Y)),
+    retract(countMove(C)),
+	    Cx is C+1,
+    asserta(countMove(Cx)),
+    write(Item), write(' sudah diambil! Kamu kini bertambah Kuat'), nl.
+
+take(Item) :-
+    position(X, Y),
+    write(X), write(' '), write(Y), nl,
+    map_element(_, L, X, Y),
+    member(Item, L), !,
+    bag(player, B),
+    bagAmmout(B, BA),
+    write(Item), write(' '), write(L), nl,
+    inInventory(player, LI),
+    length(LI, BNow),
+    \+BNow < BA, !,
+    retract(countMove(C)),
+	    Cx is C+1,
+    asserta(countMove(Cx)),
+    write(Item), write(' tidak bisa diambil, Tas kamu penuh.'), nl,
+    write('Cari Item Bag yang lebih besar ukurannya atau buang beberapa Item kamu'), nl.
 
 take(Item) :-
     position(X, Y),
@@ -532,7 +571,10 @@ take(Item) :-
     map_element(_, L, X, Y),
     write(Item), write(' '), write(L), nl,
     \+member(Item, L), !,
-    write('Tidak ada '), write(Item), write(' di sini! Miskin!'), nl.
+    retract(countMove(C)),
+	    Cx is C+1,
+    asserta(countMove(Cx)),
+    write('Kamu Bego ya?, Ndak ada '), write(Item), write(' di sini!, sering2 look makanya.'), nl.
 
 /*ARMOR ITEM*/
 use(Item) :-
@@ -547,6 +589,9 @@ use(Item) :-
     asserta(armor(player,NewArmor)),
     retract(inInventory(player,LI)),
     asserta(inInventory(player,NewLI)),
+    retract(countMove(C)),
+    Cx is C+1,
+    asserta(countMove(Cx)),
     write('Armor anda bertambah sebesar '), write(ArmorAdded), nl.
 
 /*MEDICINE ITEM*/
@@ -563,7 +608,11 @@ use(Item) :-
     asserta(health(player,100)),
     retract(inInventory(player,LI)),
     asserta(inInventory(player,NewLI)),
+	retract(countMove(C)),
+	Cx is C+1,
+    asserta(countMove(Cx)),
     write('Health anda bertambah sebesar '), write(HealthAdded), nl.
+
 
 use(Item) :-
     inInventory(player,LI),
@@ -577,6 +626,9 @@ use(Item) :-
     asserta(health(player,NewHealth)),
     retract(inInventory(player,LI)),
     asserta(inInventory(player,NewLI)),
+	retract(countMove(C)),
+	Cx is C+1,
+    asserta(countMove(Cx)),
     write('Health anda bertambah sebesar '), write(HealthAdded), nl.
 
 /*WEAPON ITEM*/
@@ -592,6 +644,9 @@ use(Item) :-
     asserta(weapon(player,Item,0)),
     retract(inInventory(player,LI)),
     asserta(inInventory(player,NewLI)),
+    retract(countMove(C)),
+	Cx is C+1,
+    asserta(countMove(Cx)),
     write('Kamu kini menggunakan '), write(Item), write(' sebagai senjata kamu'), nl.
 
 /*Kasus RangeWeapon with Ammo -> NewWeapon*/
@@ -610,6 +665,9 @@ use(Item) :-
     asserta(weapon(player,Item, 0)),
     retract(inInventory(player,LI)),
     asserta(inInventory(player,NewLI)),
+    retract(countMove(C)),
+	Cx is C+1,
+    asserta(countMove(Cx)),
     write('kamu kini menggunakan '), write(Item), write(' sebagai senjatamu'), nl,
     write('Senjata lamamu beserta ammonya kini disimpan dalam inventorimu'), nl.
 
@@ -626,6 +684,9 @@ use(Item) :-
     asserta(weapon(player,Item, 0)),
     retract(inInventory(player,LI)),
     asserta(inInventory(player,NewLI)),
+    retract(countMove(C)),
+	Cx is C+1,
+    asserta(countMove(Cx)),
     write('Kamu kini menggunakan '), write(Item), write(' sebagai senjatamu'), nl.
 
 /*AMMO ITEM*/
@@ -642,11 +703,51 @@ use(Item) :-
     asserta(weapon(player,HandWeapon, NewAmmo)),
     retract(inInventory(player,LI)),
     asserta(inInventory(player,NewLI)),
+    retract(countMove(C)),
+	Cx is C+1,
+    asserta(countMove(Cx)),
     write('kamu mengisi kembali'), write(Weapon), write(' dengan 1 buah ammo'),nl.
+
+/*BAG ITEM*/
+use(Item) :-
+    inInventory(player,LI),
+    member(Item,LI),
+    isBag(Item),
+    bag(player, B),
+    bagAmmout(B,BA_Old),
+    bagAmmout(Item,BA_New),
+    BA_Old > BA_New + 1,!,
+    retract(countMove(C)),
+	Cx is C+1,
+    asserta(countMove(Cx)),
+    write('Rugi kamu kalau menggunakan tas ini, karena inventorymu akan mengecil'),nl,
+    write('Mending kamu buang dengan perintah >drop('), write(Item),write(')'), nl.
+
+use(Item) :-
+    inInventory(player,LI),
+    member(Item,LI),
+    isBag(Item),
+    bag(player, B),
+    bagAmmout(B,BA_Old),
+    bagAmmout(Item,BA_New),
+    BA_Old < BA_New,!,
+    deleteOne(LI,Item,NewLI),
+    retract(bag(player,B)),
+    asserta(bag(player,Item)),
+    retract(inInventory(player,LI)),
+    asserta(inInventory(player,NewLI)),
+    retract(countMove(C)),
+	Cx is C+1,
+    asserta(countMove(Cx)),
+    write('Kamu sekararang menggunakan '), write(Item), write(' sebagai tas kamu.'),nl,
+    write('MaxInventory bertambah sebesar '), Add is BA_New - BA_Old, write(Add),nl.
 
 use(Item) :-
     inInventory(player,LI),
     \+member(Item, LI),
+    retract(countMove(C)),
+	Cx is C+1,
+    asserta(countMove(Cx)),
     write('Tidak bisa menggunakan barang tersebut'),nl, write('karena barang tersebut tidak ada dalam inventori'), nl.
 
 deleteOne([], _ , []).
@@ -661,7 +762,10 @@ appendNElmt(X,Count,List,Result) :- CountTemp is Count - 1, append(List,[X],NewL
 drop(Item) :-
     inInventory(player,LI),
     \+member(Item, LI),!,
-    write('Tidak bisa menjatuhkan barang tersebut'),nl, write('karena barang tersebut tidak ada dalam inventori'), nl.
+    retract(countMove(C)),
+	    Cx is C+1,
+    asserta(countMove(Cx)),
+    write('Orang kamu gapunya barang itu, gimana mau di drop bapak,'),nl.
 
 drop(Item) :-
     inInventory(player,LI),
@@ -670,6 +774,9 @@ drop(Item) :-
     delete(LI,Item,NewLI),
     asserta(inInventory(player,NewLI)),
     position(A,B),
+    retract(countMove(C)),
+	    Cx is C+1,
+    asserta(countMove(Cx)),
     retract(map_element(_,LPetak,A,B)),
     append(LPetak,[Item],NewLPetak),
     asserta(map_element(_,NewLPetak,A,B)).
@@ -681,6 +788,9 @@ drop(Item) :-
     delete(LI,Item,NewLI),
     asserta(inInventory(player,NewLI)),
     position(A,B),
+    retract(countMove(C)),
+	    Cx is C+1,
+    asserta(countMove(Cx)),
     retract(map_element(_,LPetak,A,B)),
     append(LPetak,[Item],NewLPetak),
     asserta(map_element(_,NewLPetak,A,B)).
@@ -692,17 +802,23 @@ drop(Item) :-
     delete(LI,Item,NewLI),
     asserta(inInventory(player,NewLI)),
     position(A,B),
+    retract(countMove(C)),
+	    Cx is C+1,
+    asserta(countMove(Cx)),
     retract(map_element(_,LPetak,A,B)),
     append(LPetak,[Item],NewLPetak),
     asserta(map_element(_,NewLPetak,A,B)).
 
 drop(Item) :-
     inInventory(player,LI),
-    member(Item,LI),isAmmo(Item),!,write('Anda menjatuhkan pelor '),write(LI),nl,
+    member(Item,LI),isAmmo(Item),!,write('Anda menjatuhkan Ammo '),write(LI),nl,
     retract(inInventory(player,LI)),
     delete(LI,Item,NewLI),
     asserta(inInventory(player,NewLI)),
     position(A,B),
+    retract(countMove(C)),
+	    Cx is C+1,
+    asserta(countMove(Cx)),
     retract(map_element(_,LPetak,A,B)),
     append(LPetak,[Item],NewLPetak),
     asserta(map_element(_,NewLPetak,A,B)).
@@ -730,6 +846,9 @@ checkEnemy :-
 attack :-
     position(X, Y),
     map_element(_, _, X, Y),
+    retract(countMove(C)),
+	Cx is C+1,
+    asserta(countMove(Cx)),
     checkEnemy,
     attackHelper1,!,
     write('ATTACK SEQUENCE 1'), nl.
@@ -737,6 +856,9 @@ attack :-
 attack :-
     position(X, Y),
     map_element(_, _, X, Y),
+    retract(countMove(C)),
+	Cx is C+1,
+    asserta(countMove(Cx)),
     \+checkEnemy,
     write('Tidak ada musuh disini!'), nl.
 
@@ -1046,12 +1168,51 @@ dropAmmoHelper(RanNum) :-
     write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
     asserta(map_element(S, NewL, RanX, RanY)).
 
+dropBag :-
+    random(1,6, RanNumber),
+    RanNum is RanNumber mod 3,
+    dropBagHelper(RanNum).
+
+dropBagHelper(RanNum) :-
+    RanNum = 1,
+    random(1, 15, RX),
+    random(1, 15, RY),
+    goodRandomizer(RX, RY, RanX, RanY),
+    map_element(S, L, RanX, RanY),
+    retract(map_element(S, L, RanX, RanY)),
+    append(L, [toteBag], NewL),
+    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
+    asserta(map_element(S, NewL, RanX, RanY)).
+
+dropBagHelper(RanNum) :-
+    RanNum = 2,
+    random(1, 15, RX),
+    random(1, 15, RY),
+    goodRandomizer(RX, RY, RanX, RanY),
+    map_element(S, L, RanX, RanY),
+    retract(map_element(S, L, RanX, RanY)),
+    append(L, [ransel], NewL),
+    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
+    asserta(map_element(S, NewL, RanX, RanY)).
+
+dropBagHelper(RanNum) :-
+    RanNum = 0,
+    random(1, 15, RX),
+    random(1, 15, RY),
+    goodRandomizer(RX, RY, RanX, RanY),
+    map_element(S, L, RanX, RanY),
+    retract(map_element(S, L, RanX, RanY)),
+    append(L, [carrierBag], NewL),
+    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
+    asserta(map_element(S, NewL, RanX, RanY)).
+
 dropRandomizer :-
 	countMove(CM),
 	TotalRandom is CM div 5,
 	forall(between(1,TotalRandom,_),
 		(
-			random(1, 5, RanNum),
+			random(1, 10, RanNumber),
+            RanNum is RanNumber mod 5,
 			dropRandomizerHelper(RanNum)
 		)
 	).
@@ -1071,6 +1232,10 @@ dropRandomizerHelper(RanNum) :-
 dropRandomizerHelper(RanNum) :-
     RanNum = 4,
     dropAmmo.
+
+dropRandomizerHelper(RanNum) :-
+    RanNum = 0,
+    dropBag.
 
 goodRandomizer(X, Y, XN, YN) :-
     map_element(S, _, X, Y),
@@ -1216,6 +1381,11 @@ save(FileName) :-
     write(Save,LI),
     write(Save,'.'),nl(Save),
 
+    %Status_Bag
+    bag(player,BAG),
+    write(Save,BAG),
+    write(Save,'.'), nl(Save),
+    
     %NPC
     inInventory(tentaraBelanda,TBLI),
     write(Save,TBLI),
@@ -1328,6 +1498,11 @@ loadf(FileName):-
     retract(inInventory(player,_)),
     read(Baca,LI),
     asserta(inInventory(player,LI)),
+
+    %Player_Bag
+    retract(bag(player,_)),
+    read(Baca,BAG),
+    asserta(bag(player,BAG)),
 
     %NPC
     retract(inInventory(tentaraBelanda,_)),
