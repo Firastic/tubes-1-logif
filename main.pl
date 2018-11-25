@@ -98,7 +98,7 @@ start:-
     write('  Kamu mendapati dirimu terbangun di sebuah tempat antah berantah         '),nl,
     write('  kamu menemukan sebuah pesan di sebelah tempatmu terbangun,              '),nl,
     write('  Pesan itu bertulisankan:                                                '),nl,
-    write('  "Wahai kamu pemuda yang senang bermalasan - malasan. Kini               '),nl,
+    write('  "Wahai Wangky,pemuda yang senang bermalasan - malasan. Kini             '),nl,
     write('   kami leluhurmu, memanggilmu kesini, ke Medan Pertempuran ini,          '),nl,
     write('   agar kau tahu betapa beratnya melawan musuh- musuh bangsa,             '),nl,
 	write('   untuk kembali ke asalmu, kamu harus menjadi satu - satunya yang selamat'),nl,
@@ -119,10 +119,10 @@ start:-
 	write('     X            |              X    '),nl,
 	write('     X            |              X    '),nl,
 	write('     X X X X X X X X X X X X X X X    '),nl,nl,
-    write(' Berjuanlah, Demi Dirimu, Keluargamu, Teman - Teman mu, dan Bangsamu, !!!'),nl,nl,
-	write('  Gunakan Command >help. untuk melihat apa saja yang bisa kamu lakukan! '),nl,
+    write('Berjuanglah, Demi Dirimu, Keluargamu, Teman - Teman mu, dan Bangsamu, !!!'),nl,nl,
+	write('  Pertama - tama,tulis lah " help. " setelah tanda " >> " dibawah ini!'),nl,nl,
     repeat,
-    write('>'), read(A),
+    write('>>'), read(A),
     do(A),nl,
     (A == quit ; gameoverZonaMati; checkPlayerLife;menang).
 
@@ -142,7 +142,7 @@ help :-
   write('   save(namafile.txt). -- Menyimpan file gim Anda!                         '),nl,
   write('   load(namafile.txt). -- Memasukkan data dari file ke gim.                '),nl,nl,
   write('Beberapa simbol yang Anda perlu tahu:                                      '),nl,
-  write('   S = Senjata                                                             '),nl,
+  write('   W = Senjata                                                             '),nl,
   write('   L = Ammo/Logistik(nama lainnya pelor lah)                               '),nl,
   write('   A = Armor/Perlengkapan Perang                                           '),nl,
   write('   O = Obat                                                                '),nl,
@@ -183,7 +183,7 @@ game_start:-
 
 
 quit :-
-  write(' Wangky gagal karena kamu :( ').
+  write(' Wangky gagal dalam medan pertempuran ini :( ').
 
 map1(N):-
   (map_element(A,_,N,1) -> write(A)),write(' '),
@@ -347,14 +347,26 @@ s :- position(A,B), Ax is (A+1), moveFromTo(A,B,Ax,B), narasi_lokasi(Ax,B).
 n :- position(A,B), Ax is (A-1), moveFromTo(A,B,Ax,B), narasi_lokasi(Ax,B).
 e :- position(A,B), Bx is (B+1), moveFromTo(A,B,A,Bx), narasi_lokasi(A,Bx).
 w :- position(A,B), Bx is (B-1), moveFromTo(A,B,A,Bx), narasi_lokasi(A,Bx).
+se :- position(A,B), Ax is (A+1),Bx is (B+1), moveFromTo(A,B,Ax,Bx), narasi_lokasi(Ax,Bx).
+sw :- position(A,B), Ax is (A+1),Bx is (B-1), moveFromTo(A,B,Ax,Bx), narasi_lokasi(Ax,Bx).
+ne :- position(A,B), Ax is (A-1),Bx is (B+1), moveFromTo(A,B,Ax,Bx), narasi_lokasi(Ax,Bx).
+nw :- position(A,B), Ax is (A-1),Bx is (B-1), moveFromTo(A,B,Ax,Bx), narasi_lokasi(Ax,Bx).
 
 narasi_lokasi(X,Y) :-
     NS is X+1, NN is X-1, NE is Y+1, NW is Y-1,
     write('s'),narasiHelper(NS,Y),
     write('n'),narasiHelper(NN,Y),
     write('e'),narasiHelper(X,NE),
-    write('w'),narasiHelper(X,NW).
-
+    write('w'),narasiHelper(X,NW),
+    write('se'),narasiHelper(NS,NE),
+    write('sw'),narasiHelper(NS, NW),
+	write('ne'),narasiHelper(NN,NE),
+    write('nw'),narasiHelper(NN,NW).
+	
+narasiHelper(A,B):-
+	map_element(Isi,_,A,B), Isi = 'X',!,
+	write(' selanjutnya menuju ke Deathzone'), nl.
+%Else
 narasiHelper(A,B):-
     A > 1, A < 8, B > 1, B < 9,!,
     write(' selanjutnya menuju ke Padang Pasir Terbuka'),nl.
@@ -370,12 +382,10 @@ narasiHelper(A,B):-
 narasiHelper(A,B):-
     A > 8, A < 15, B > 7, B < 15,!,
     write(' selanjutnya menuju ke Hutan'),nl.
+	
 narasiHelper(A,B):-
     A = 8, B = 8,!,
     write(' selanjutnya menuju ke Titik Tengah Arena'),nl.
-
-narasiHelper(_,_):-
-    write(' Menuju ke Deathzone').
 
 look_pos(X,Y) :- map_element(A,_,X,Y), A == 'X', !, write(A).
 look_pos(X,Y) :- map_element(_,_B,X,Y), _B == [], !, write('-').
@@ -506,6 +516,18 @@ look_desc(X,Y) :- map_element(_,_B,X,Y), member(anaksumpit,_B),
     write('Terdapat sebuah anaksumpit yang sudah dilumuri dengan racun yang mematikan di depan matamu.'),nl,
     write('ambil dengan command >take(anaksumpit). untuk menyimpannya di dalam tas kamu, '), nl,
     write('dan INGAT, pastikan mengambil dengan sangat hati hati.'),nl, fail.
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(toteBag,_B),
+    write('Kamu menemukan sebuah toteBag bekas acara himpunan. Memang kecil, tapi toteBag tersebut setidaknya'),nl,
+	write('bisa membantumu membawa barang2 itu.'),nl,
+    write('Gunakan command >take(toteBag). untuk mengambil benda tersebut'),nl, fail.
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(carrierBag,_B),
+    write('Wow, Lihat apa yang baru saja kamu temukan, kamu menemukan sebauh Tas Carrier,'),nl,
+    write('Dengan benda sebesar itu kamu bisa membawa banyak barang di medan pertempuran ini.'),nl,    
+	write('Ambil dengan command >take(carrierBag), untuk menyimpannya, dan jangan lupa kamu gunakan benda bagus ini'),nl, fail.
+look_desc(X,Y) :- map_element(_,_B,X,Y), member(ransel,_B),
+    write('Kamu menemukan sebuah benda yang tak asing dari kehidupan kampusmu, benda itu adalah RANSEL'),nl,
+	write('Dengan benda ini, kamu setidaknya bisa membawa barang lebih banyak di medan pertempuran ini'),nl,
+    write('ambil dengan command >take(ransel). untuk menyimpannya '), nl,fail.
 look_desc(_,_) :- nl.
 
 look :- position(A,B),
@@ -563,7 +585,7 @@ tulisInventory([H|T])  :- write(' -'),write(H),nl, tulisInventory(T).
 take(Item) :-
     position(X, Y),
     write(X), write(' '), write(Y), nl,
-    map_element(A, L, X, Y),
+    map_element(WAS_HERE, L, X, Y),
     member(Item, L),
     bag(player, B),
     bagAmmout(B, BA),
@@ -589,7 +611,7 @@ take(Item) :-
     write("DEBUG"),
     position(X, Y),
     write(X), write(' '), write(Y), nl,
-    map_element(WAS_HERE, L, X, Y),
+    map_element(_, L, X, Y),
     member(Item, L),
     bag(player, B),
     bagAmmout(B, BA),
@@ -606,7 +628,7 @@ take(Item) :-
 take(Item) :-
     position(X, Y),
     write(X), write(' '), write(Y), nl,
-    map_element(WAS_HERE, L, X, Y),
+    map_element(_, L, X, Y),
     write(Item), write(' '), write(L), nl,
     \+member(Item, L), !,
     retract(countMove(C)),
@@ -1318,7 +1340,7 @@ dropRandomizerHelper(RanNum) :-
     RanNum = 5,
     dropBag.
 
-dropRandomizerHelper(RanNum).
+dropRandomizerHelper(_).
 
 goodRandomizer(X, Y, XN, YN) :-
     map_element(S, _, X, Y),
@@ -1636,6 +1658,10 @@ do(s) :- s, moveAllEnemy, dropRandomizer, !.
 do(n) :- n, moveAllEnemy, dropRandomizer, !.
 do(e) :- e, moveAllEnemy, dropRandomizer, !.
 do(w) :- w, moveAllEnemy, dropRandomizer, !.
+do(sw) :- sw, moveAllEnemy, dropRandomizer, !.
+do(se) :- se, moveAllEnemy, dropRandomizer, !.
+do(nw) :- nw, moveAllEnemy, dropRandomizer, !.
+do(ne) :- ne, moveAllEnemy, dropRandomizer, !.
 do(quit) :-quit,!.
 do(gameover) :-gameover,!.
 do(look) :- look,!.
