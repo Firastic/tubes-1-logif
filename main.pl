@@ -1,5 +1,4 @@
 /* Init Game */
-/*:-dynamic(location/1).*/
 :-dynamic(map_element/4).
 :-dynamic(position/2).
 :-dynamic(countMove/1).
@@ -38,7 +37,7 @@ isBag(toteBag).
 bagAmmout(carrierBag, 25).
 bagAmmout(ransel, 15).
 bagAmmout(toteBag,10).
-bagAmmout(none, 1).
+bagAmmout(none, 5).
 
 health(tentaraBelanda, 100).
 health(tentaraJepang, 100).
@@ -217,7 +216,6 @@ initEnemy(A) :-
     retract(positionNPC(A, X, Y)),
     random(2, 14, NewX),
     random(2, 14, NewY),
-    write('initposition'), write(NewX), write(NewY),nl,
     asserta(positionNPC(A, NewX, NewY)),
     map_element(S, L, NewX, NewY),
     retract(map_element(S, L, NewX, NewY)),
@@ -226,22 +224,16 @@ initEnemy(A) :-
 
 moveEnemy(A) :-
     positionNPC(A, X, Y),
-    write(A), nl,
     retract(positionNPC(A, X, Y)),
-    write(X), write('spasi'), write(Y), nl,
     map_element(S, L, X, Y),
-    write(L), nl,
     retract(map_element(S, L, X, Y)),
     deleteOne(L, A, NL),
-    write(NL), nl,
     asserta(map_element(S, NL, X, Y)),
     moveEnemyHelper(X, Y, NNewX, NNewY, 1),
-    print(NNewX), print('spasi'), print(NNewY), nl,
     map_element(NextS, NextL, NNewX, NNewY),
     retract(map_element(NextS, NextL, NNewX, NNewY)),
     asserta(positionNPC(A, NNewX, NNewY)),
     append(NextL, [A], NewList),
-    write(NewList), nl,
     asserta(map_element(NextS, NewList, NNewX, NNewY)).
 
 moveEnemyHelper(X, Y, NewX, NewY, It) :-
@@ -535,9 +527,7 @@ look :- position(A,B),
         A1 is A-1,
         B1 is B-1,
         look_rek(A1,B1,1),nl,
-        look_desc(A,B),
-        map_element(_,X,A,B),
-        write(X).
+        look_desc(A,B).
 
 
 cheathelper(N):-
@@ -587,20 +577,15 @@ tulisInventory([H|T])  :- write(' -'),write(H),nl, tulisInventory(T).
 
 take(Item) :-
     position(X, Y),
-    write(X), write(' '), write(Y), nl,
     map_element(WAS_HERE, L, X, Y),
     member(Item, L),
     bag(player, B),
     bagAmmout(B, BA),
-    write(Item), write(' '), write(L), nl,
     inInventory(player, LI),
     length(LI, BNow),
     BNow < BA,
-    write(LI), nl,
     retract(inInventory(player, LI)),
-    write(LI), nl,
     append(LI, [Item], NLI),
-    write(NLI), nl,
     asserta(inInventory(player, NLI)),
     retract(map_element(WAS_HERE, L, X, Y)),
     deleteOne(L, Item, LNEW),
@@ -612,12 +597,10 @@ take(Item) :-
 
 take(Item) :-
     position(X, Y),
-    write(X), write(' '), write(Y), nl,
     map_element(_, L, X, Y),
     member(Item, L),
     bag(player, B),
     bagAmmout(B, BA),
-    write(Item), write(' '), write(L), nl,
     inInventory(player, LI),
     length(LI, BNow),
     BA =:= BNow,
@@ -629,9 +612,7 @@ take(Item) :-
 
 take(Item) :-
     position(X, Y),
-    write(X), write(' '), write(Y), nl,
     map_element(_, L, X, Y),
-    write(Item), write(' '), write(L), nl,
     \+member(Item, L), !,
     retract(countMove(C)),
 	    Cx is C+1,
@@ -842,7 +823,7 @@ drop(Item) :-
 
 drop(Item) :-
     inInventory(player,LI),
-    member(Item,LI),isWeapon(Item),!,write('Anda menjatuhkan senjata '),write(LI),nl,
+    member(Item,LI),isWeapon(Item),!,write('Anda menjatuhkan senjata '),nl,
     retract(inInventory(player,LI)),
     deleteOne(LI,Item,NewLI),
     asserta(inInventory(player,NewLI)),
@@ -856,7 +837,7 @@ drop(Item) :-
 
 drop(Item) :-
     inInventory(player,LI),
-    member(Item,LI),isMedicine(Item),!,write('Anda menjatuhkan obat '),write(LI),nl,
+    member(Item,LI),isMedicine(Item),!,write('Anda menjatuhkan obat '),nl,
     retract(inInventory(player,LI)),
     deleteOne(LI,Item,NewLI),
     asserta(inInventory(player,NewLI)),
@@ -870,7 +851,7 @@ drop(Item) :-
 
 drop(Item) :-
     inInventory(player,LI),
-    member(Item,LI),isArmor(Item),!,write('Anda menjatuhkan pelindung '),write(LI),nl,
+    member(Item,LI),isArmor(Item),!,write('Anda menjatuhkan pelindung '),nl,
     retract(inInventory(player,LI)),
     deleteOne(LI,Item,NewLI),
     asserta(inInventory(player,NewLI)),
@@ -884,7 +865,7 @@ drop(Item) :-
 
 drop(Item) :-
     inInventory(player,LI),
-    member(Item,LI),isAmmo(Item),!,write('Anda menjatuhkan Ammo '),write(LI),nl,
+    member(Item,LI),isAmmo(Item),!,write('Anda menjatuhkan Ammo '),nl,
     retract(inInventory(player,LI)),
     deleteOne(LI,Item,NewLI),
     asserta(inInventory(player,NewLI)),
@@ -898,7 +879,7 @@ drop(Item) :-
 
 drop(Item) :-
     inInventory(player,LI),
-    member(Item,LI),isBag(Item),!,write('Anda menjatuhkan Tas '),write(LI),nl,
+    member(Item,LI),isBag(Item),!,write('Anda menjatuhkan Tas '),nl,
     retract(inInventory(player,LI)),
     deleteOne(LI,Item,NewLI),
     asserta(inInventory(player,NewLI)),
@@ -937,8 +918,7 @@ attack :-
 	Cx is C+1,
     asserta(countMove(Cx)),
     checkEnemy,
-    attackHelper1,!,
-    write('ATTACK SEQUENCE 1'), nl.
+    attackHelper1,!.
 
 attack :-
     position(X, Y),
@@ -966,7 +946,7 @@ attackHelper2(WEAPON_PLAYER) :-
     AMMO_TYPE = none,
     position(X, Y),
     positionNPC(NPC, X, Y),
-    write('Kamu menyerang '), write(NPC), write('! Kasihan dia!'), nl,
+    write('Kamu menyerang '), write(NPC), write('!'), nl,nl,
     health(NPC, CURRENT_HEALTH),
     retract(health(NPC, CURRENT_HEALTH)),
     damage(WEAPON_PLAYER, DAMAGE_PLAYER),
@@ -1005,14 +985,14 @@ attackHelper2(WEAPON_PLAYER) :-
     write(AMMO_TYPE), write(' berkurang 1!'), nl,
     position(X, Y),
     positionNPC(NPC, X, Y),
-    write('Kamu menyerang '), write(NPC), write('!'), nl,
+    write('Kamu menyerang '), write(NPC), write('!'), nl,nl,
     health(NPC, CURRENT_HEALTH),
     retract(health(NPC, CURRENT_HEALTH)),
     damage(WEAPON_PLAYER, DAMAGE_PLAYER),
     NEW_HEALTH is CURRENT_HEALTH - DAMAGE_PLAYER,
     asserta(health(NPC, NEW_HEALTH)),
     write('Nyawa '), write(NPC), write(' berkurang '), write(DAMAGE_PLAYER), write('!'), nl,
-    write('Nyawa '), write(NPC), write(' sekarang tinggal '), write(NEW_HEALTH),nl,
+    write('Nyawa '), write(NPC), write(' sekarang tinggal '), write(NEW_HEALTH),nl,nl,
     attackHelper3,!.
 
 %Enemy_Attacking_Player
@@ -1056,8 +1036,8 @@ attackHelper3 :-
     health(NPC, HEALTH_NPC),
     \+HEALTH_NPC > 0,
     write(NPC), write(' telah kamu bunuh! Dia menjatuhkan hal berikut!'), nl,
-    inInventory(NPC, INVENTORY_LIST),
-    write(INVENTORY_LIST),
+    inInventory(NPC, LI),
+    write(LI),nl,
     dropNPC(NPC),
     retract(map_element(S, L, X, Y)),
     deleteOne(L,NPC,NL),
@@ -1079,7 +1059,7 @@ dropNPC(NPC) :-
 checkPlayerLife :-
     health(player, CURRENT_HEALTH),
     CURRENT_HEALTH < 1,
-    write('Kamu mati! Permainan selesai!'), nl.
+    write('CUPU! Kamu Tewas dalam permainan ini, sampaikan selamat tinggal pada kehidupanmu!'), nl.
 
 dropMedicine :-
     random(1, 5, RanNum),
@@ -1093,7 +1073,6 @@ dropMedicineHelper(RanNum) :-
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
     append(L, [panadol], NewL),
-    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
     asserta(map_element(S, NewL, RanX, RanY)).
 
 dropMedicineHelper(RanNum) :-
@@ -1104,7 +1083,6 @@ dropMedicineHelper(RanNum) :-
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
     append(L, [obhCombi], NewL),
-    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
     asserta(map_element(S, NewL, RanX, RanY)).
 
 dropMedicineHelper(RanNum) :-
@@ -1115,7 +1093,6 @@ dropMedicineHelper(RanNum) :-
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
     append(L, [minyakKayuPutih], NewL),
-    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
     asserta(map_element(S, NewL, RanX, RanY)).
 
 dropMedicineHelper(RanNum) :-
@@ -1126,7 +1103,6 @@ dropMedicineHelper(RanNum) :-
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
     append(L, [jamu], NewL),
-    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
     asserta(map_element(S, NewL, RanX, RanY)).
 
 dropArmor :-
@@ -1141,7 +1117,6 @@ dropArmorHelper(RanNum) :-
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
     append(L, [tameng], NewL),
-    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
     asserta(map_element(S, NewL, RanX, RanY)).
 
 dropArmorHelper(RanNum) :-
@@ -1152,7 +1127,6 @@ dropArmorHelper(RanNum) :-
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
     append(L, [zirah], NewL),
-    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
     asserta(map_element(S, NewL, RanX, RanY)).
 
 dropArmorHelper(RanNum) :-
@@ -1163,7 +1137,6 @@ dropArmorHelper(RanNum) :-
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
     append(L, [helm], NewL),
-    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
     asserta(map_element(S, NewL, RanX, RanY)).
 
 dropArmorHelper(RanNum) :-
@@ -1174,7 +1147,6 @@ dropArmorHelper(RanNum) :-
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
     append(L, [jimat], NewL),
-    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
     asserta(map_element(S, NewL, RanX, RanY)).
 
 dropArmorHelper(RanNum) :-
@@ -1185,7 +1157,6 @@ dropArmorHelper(RanNum) :-
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
     append(L, [batuAkik], NewL),
-    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
     asserta(map_element(S, NewL, RanX, RanY)).
 
 dropWeapon :-
@@ -1200,7 +1171,6 @@ dropWeaponHelper(RanNum) :-
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
     append(L, [keris], NewL),
-    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
     asserta(map_element(S, NewL, RanX, RanY)).
 
 dropWeaponHelper(RanNum) :-
@@ -1211,7 +1181,6 @@ dropWeaponHelper(RanNum) :-
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
     append(L, [kujang], NewL),
-    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
     asserta(map_element(S, NewL, RanX, RanY)).
 
 dropWeaponHelper(RanNum) :-
@@ -1222,7 +1191,6 @@ dropWeaponHelper(RanNum) :-
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
     append(L, [bambuRuncing], NewL),
-    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
     asserta(map_element(S, NewL, RanX, RanY)).
 
 dropWeaponHelper(RanNum) :-
@@ -1233,7 +1201,6 @@ dropWeaponHelper(RanNum) :-
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
     append(L, [senapan], NewL),
-    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
     asserta(map_element(S, NewL, RanX, RanY)).
 
 dropWeaponHelper(RanNum) :-
@@ -1244,7 +1211,6 @@ dropWeaponHelper(RanNum) :-
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
     append(L, [sumpit], NewL),
-    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
     asserta(map_element(S, NewL, RanX, RanY)).
 
 dropWeaponHelper(RanNum) :-
@@ -1255,7 +1221,6 @@ dropWeaponHelper(RanNum) :-
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
     append(L, [duit], NewL),
-    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
     asserta(map_element(S, NewL, RanX, RanY)).
 
 dropAmmo :-
@@ -1270,7 +1235,6 @@ dropAmmoHelper(RanNum) :-
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
     append(L, [peluru], NewL),
-    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
     asserta(map_element(S, NewL, RanX, RanY)).
 
 dropAmmoHelper(RanNum) :-
@@ -1281,7 +1245,6 @@ dropAmmoHelper(RanNum) :-
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
     append(L, [anaksumpit], NewL),
-    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
     asserta(map_element(S, NewL, RanX, RanY)).
 
 dropBag :-
@@ -1297,7 +1260,6 @@ dropBagHelper(RanNum) :-
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
     append(L, [toteBag], NewL),
-    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
     asserta(map_element(S, NewL, RanX, RanY)).
 
 dropBagHelper(RanNum) :-
@@ -1308,7 +1270,6 @@ dropBagHelper(RanNum) :-
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
     append(L, [ransel], NewL),
-    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
     asserta(map_element(S, NewL, RanX, RanY)).
 
 dropBagHelper(RanNum) :-
@@ -1319,7 +1280,6 @@ dropBagHelper(RanNum) :-
     map_element(S, L, RanX, RanY),
     retract(map_element(S, L, RanX, RanY)),
     append(L, [carrierBag], NewL),
-    write(NewL), write(' di ('), write(RanX), write(', '), write(RanY), write(')'), nl,
     asserta(map_element(S, NewL, RanX, RanY)).
 
 dropRandomizer :-
@@ -1535,7 +1495,6 @@ save(FileName) :-
             )
         )
     ),
-
     isCheat(CHEAT),
     write(Save,CHEAT),
     write(Save,'.'),

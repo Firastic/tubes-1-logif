@@ -109,7 +109,7 @@ map_element('-',[],8,3).
 map_element('-',[],8,4).
 map_element('-',[],8,5).
 map_element('-',[],8,6).
-map_element('-',[senapan,senapan,senapan],8,7).
+map_element('-',[],8,7).
 map_element('-',[],8,8).
 map_element('-',[],8,9).
 map_element('-',[],8,10).
@@ -229,7 +229,7 @@ positionNPC(tentaraBelanda, 0, 0).
 positionNPC(tentaraJepang, 0, 0).
 positionNPC(antekPKI, 0, 0).
 positionNPC(koruptor, 0, 0).
-inInventory(player, [anaksumpit]).
+inInventory(player, []).
 inInventory(tentaraBelanda, [senapan]).
 inInventory(tentaraJepang, [sumpit]).
 inInventory(antekPKI, [kujang]).
