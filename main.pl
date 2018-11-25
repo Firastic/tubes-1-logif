@@ -133,6 +133,7 @@ help :-
   write('   quit. -- Keluar dari gim                                                '),nl,
   write('   look. -- Lihat sekeliling Anda!                                         '),nl,
   write('   n. s. e. w. --Bergerak ke utara,selatan,timur,barat!                    '),nl,
+  write('   ne. nw. se. sw. --Bergerak secara diagonal!                             '),nl,
   write('   map. -- Melihat peta!                                                   '),nl,
   write('   take(Object). -- Mengambil objek pada petak sekarang.                   '),nl,
   write('   drop(Object), -- Menjatuhkan objek pada petak sekarang.                 '),nl,
@@ -561,6 +562,8 @@ cheat :-
     cheathelper(8),cheathelper(9),cheathelper(10),cheathelper(11),cheathelper(12),cheathelper(13),cheathelper(14),cheathelper(15).
 
 status :-
+	write('Name  : Wangky'),nl,
+	write('=Status= '),nl,
     inInventory(player,LI),
     health(player,H),
     armor(player,A),
@@ -608,7 +611,6 @@ take(Item) :-
     write(Item), write(' sudah diambil! Kamu kini bertambah Kuat'), nl.
 
 take(Item) :-
-    write("DEBUG"),
     position(X, Y),
     write(X), write(' '), write(Y), nl,
     map_element(_, L, X, Y),
@@ -756,7 +758,7 @@ use(Item) :-
     isAmmo(Item),
     weaponAmmo(Weapon,Item),
     weapon(player, HandWeapon, AmmoNow),
-    HandWeapon == Weapon,
+    HandWeapon == Weapon,!,
     NewAmmo is AmmoNow +1,
     deleteOne(LI,Item,NewLI),
     retract(weapon(player,HandWeapon, AmmoNow)),
@@ -767,7 +769,18 @@ use(Item) :-
 	Cx is C+1,
     asserta(countMove(Cx)),
     write('kamu mengisi kembali'), write(Weapon), write(' dengan 1 buah ammo'),nl.
-
+	
+use(Item) :-
+    inInventory(player,LI),
+    member(Item, LI),
+    isAmmo(Item),
+    weaponAmmo(Weapon,Item),
+    weapon(player, HandWeapon, _),
+    \+HandWeapon == Weapon,!,
+    retract(countMove(C)),
+	Cx is C+1,
+    asserta(countMove(Cx)),
+    write('Gagal menggunakan '), write(Item), write(' karena tidak sesuai dengan senjatamu'),nl.
 /*BAG ITEM*/
 use(Item) :-
     inInventory(player,LI),
@@ -1685,22 +1698,22 @@ gameoverZonaMati :-
     write('KAMU KALAH! Lain Kali Jangan Mengenai Zona Mati ya!'),nl.
 
 menang :-
-  isNPC([]),!,
-  write('                                   ANDA BERHASIL MENGALAHKAN PARA MUSUH!  '),nl,
-  write('                               % ----------------------------------------- %'),nl,
-  write('                                               Dibuat oleh:'),nl,nl,
-  write('                               % ----------------------------------------- %'),nl,
-  write('                               %      TUGAS BESAR LOGIKA INFOMARTIKA       %'),nl,
-  write('                               %                Kelompok 1                 %'),nl,
-  write('                               %            "WANGKY ADVENTURE"             %'),nl,
-  write('                               %                 Kelas 01                  %'),nl,
-  write('                               % ----------------------------------------- %'),nl,
-  write('                               % 13517007 - Mohammad Ridwan Hady Arifin    %'),nl,
-  write('                               % 13517070 - Aidil Rezjki Suljztan Sywaludin%'),nl,
-  write('                               % 13517091 - Adyaksa Wisanggeni             %'),nl,
-  write('                               % 13517115 - Edward Busug Alexander Jaya    %'),nl,
-  write('                               % ----------------------------------------- %'),nl,
-  write('      ##      ##    ###    ##    ##  ######   ##    ## ##    ## ####  ######          '),nl,
+	isNPC([]),!,
+	write('                                   ANDA BERHASIL MENGALAHKAN PARA MUSUH!  '),nl,
+	write('                               % ----------------------------------------- %'),nl,
+	write('                                               Dibuat oleh:'),nl,nl,
+	write('                               % ----------------------------------------- %'),nl,
+	write('                               %      TUGAS BESAR LOGIKA INFOMARTIKA       %'),nl,
+	write('                               %                Kelompok 1                 %'),nl,
+	write('                               %            "WANGKY ADVENTURE"             %'),nl,
+	write('                               %                 Kelas 01                  %'),nl,
+	write('                               % ----------------------------------------- %'),nl,
+	write('                               % 13517007 - Mohammad Ridwan Hady Arifin    %'),nl,
+	write('                               % 13517070 - Aidil Rezjki Suljztan Sywaludin%'),nl,
+	write('                               % 13517091 - Adyaksa Wisanggeni             %'),nl,
+	write('                               % 13517115 - Edward Busug Alexander Jaya    %'),nl,
+	write('                               % ----------------------------------------- %'),nl,
+	write('      ##      ##    ###    ##    ##  ######   ##    ## ##    ## ####  ######          '),nl,
 	write('      ##  ##  ##   ## ##   ###   ## ##    ##  ##   ##   ##  ##  #### ##    ##         '),nl,
 	write('      ##  ##  ##  ##   ##  ####  ## ##        ##  ##     ####    ##  ##               '),nl,
 	write('      ##  ##  ## ##     ## ## ## ## ##   #### #####       ##    ##    ######          '),nl,
